@@ -1,0 +1,23 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Black Ghost's Garage emblem">
+  <circle cx="100" cy="100" r="98" fill="#E8302A" stroke="#F5F3EF" stroke-width="4"/>
+  <path
+    d="M100 36
+       C 130 36 154 60 154 92
+       L 154 150
+       C 154 156 147 159 143 154
+       L 132 141
+       C 129 137 123 137 120 141
+       L 110 154
+       C 107 158 101 158 98 154
+       L 88 141
+       C 85 137 79 137 76 141
+       L 65 154
+       C 61 159 54 156 54 150
+       L 54 92
+       C 54 60 78 36 108 36 Z"
+    fill="#0A0A0A"
+  />
+  <ellipse cx="82" cy="88" rx="9" ry="13" fill="#E8302A"/>
+  <ellipse cx="122" cy="88" rx="9" ry="13" fill="#E8302A"/>
+  <path d="M82 118 Q100 130 118 118 Q100 138 82 118 Z" fill="#E8302A"/>
+</svg>
