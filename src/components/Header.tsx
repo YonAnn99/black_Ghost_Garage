@@ -34,7 +34,7 @@ export default function Header() {
         {/* Logo */}
         <a href="#inicio" className="flex items-center gap-3 group">
           <Image
-            src="/images/ghost-logo.svg"
+            src="/images/ghost-logo.png"
             alt="Black Ghost's Garage"
             width={36}
             height={36}

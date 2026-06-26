@@ -21,7 +21,7 @@ export default function Hero() {
           <div className="relative">
             <div className="absolute inset-0 -z-10 scale-150 rounded-full bg-ghost-red/25 blur-2xl" />
             <Image
-              src="/images/ghost-logo.svg"
+              src="/images/ghost-logo.png"
               alt="Black Ghost's Garage"
               width={108}
               height={108}
