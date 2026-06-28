@@ -14,7 +14,7 @@ export default function Footer() {
               <div className="relative p-1">
                 <div className="absolute inset-0 border border-ghost-red/15" aria-hidden="true" />
                 <Image
-                  src="/images/ghost-logo.svg"
+                  src="/images/ghost-logo.png"
                   alt=""
                   width={24}
                   height={24}
