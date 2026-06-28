@@ -30,6 +30,7 @@
 | 2026-06-28 | ghost-logo.png regenerado | Fondo transparente, 1024×1024 RGBA, círculo rojo + fantasma negro |
 | 2026-06-28 | Favicon personalizado | `src/app/icon.png` — Logo ghost para pestaña del navegador (Next.js App Router metadata) |
 | 2026-06-28 | Logo footer actualizado | `Footer.tsx` cambiado de `ghost-logo.svg` a `ghost-logo.png` |
+| 2026-06-28 | **SEO completo implementado** | `robots.txt`, `sitemap.ts`, Open Graph, Twitter Cards, Structured Data JSON-LD (AutoRepair) |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 
@@ -84,10 +85,11 @@ Path alias:    @/* → ./src/*
 black-ghosts-garage/
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx          # Root layout, fonts, metadata SEO
-│   │   ├── page.tsx            # Página principal (ensambla componentes)
+│   │   ├── layout.tsx          # Root layout, fonts, metadata SEO completa
+│   │   ├── page.tsx            # Página principal + Structured Data JSON-LD
 │   │   ├── globals.css         # Tokens de diseño, utilidades, keyframes
 │   │   ├── icon.png            # Favicon personalizado (ghost logo)
+│   │   ├── sitemap.ts          # Sitemap dinámico (Next.js App Router)
 │   │   └── api/contact/route.ts # API POST para formulario de contacto
 │   ├── components/
 │   │   ├── Header.tsx          # Navbar fija, blur, mobile menu (client)
@@ -102,7 +104,9 @@ black-ghosts-garage/
 │       ├── data.ts             # Datos estáticos (servicios, nav, contacto, galería)
 │       └── useScrollReveal.ts  # Hook IntersectionObserver
 ├── .env.local                  # Credenciales SMTP (no commitear)
-├── public/images/
+├── public/
+│   ├── robots.txt              # Reglas para crawlers + sitemap URL
+│   └── images/
 │   ├── ghost-logo.png
 │   └── ghost-logo.svg
 ├── package.json
