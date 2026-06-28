@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://black-ghost-garage.vercel.app/sitemap.xml
