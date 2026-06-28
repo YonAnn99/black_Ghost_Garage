@@ -20,14 +20,15 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const el = entry.target as HTMLElement;
           if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
             const delay = el.dataset.revealDelay;
             if (delay) {
               el.style.animationDelay = `${delay}ms`;
             }
             el.classList.add("is-visible");
-            observer.unobserve(el);
+          } else {
+            el.classList.remove("is-visible");
           }
         });
       },

@@ -8,15 +8,18 @@ const groupIcons: Record<string, string> = {
 
 export default function Services() {
   return (
-    <section id="servicios" className="relative bg-void py-24 md:py-32">
+    <section id="servicios" className="relative bg-void py-24 md:py-32" aria-labelledby="services-heading">
       <div className="mx-auto max-w-7xl px-6 md:px-8">
         {/* Section header */}
         <div className="reveal mb-16 flex flex-col gap-4 border-b border-line pb-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <span className="text-data text-[11px] uppercase text-ghost-red">
+            <span className="text-data-wide text-[10px] uppercase text-ghost-red tracking-[0.15em]">
               ◆ Panel de diagnóstico
             </span>
-            <h2 className="text-display mt-3 text-[clamp(2rem,5vw,3.2rem)] leading-none text-bone">
+            <h2
+              id="services-heading"
+              className="text-display mt-4 text-[clamp(2.2rem,5.5vw,3.5rem)] leading-[0.9] text-bone"
+            >
               Nuestros servicios
             </h2>
           </div>
@@ -26,8 +29,8 @@ export default function Services() {
           </p>
         </div>
 
-        {/* Diagnostic HUD grid — signature element */}
-        <div className="grid gap-5 md:grid-cols-3">
+        {/* Diagnostic HUD grid */}
+        <div className="grid gap-5 md:grid-cols-3" role="list">
           {serviceGroups.map((group, idx) => (
             <ServiceCard key={group.id} group={group} index={idx} />
           ))}
@@ -48,30 +51,47 @@ function ServiceCard({
   const iconPath = groupIcons[group.id];
 
   return (
-    <div
-      className={`reveal group relative flex flex-col border p-6 transition-colors duration-300 md:p-7 ${
+    <article
+      role="listitem"
+      className={`reveal group relative flex flex-col transition-all duration-300 ${
         highlighted
-          ? "border-ghost-red bg-ghost-red md:-translate-y-3"
-          : "border-line bg-panel hover:border-bone-faint"
+          ? "border-2 border-ghost-red bg-ghost-red md:-translate-y-3"
+          : "border border-line bg-panel hover:border-bone-faint"
       }`}
-      data-reveal-delay={index * 100}
+      data-reveal-delay={index * 120}
+      aria-label={`Servicio: ${group.title}`}
     >
+      {/* Double-bezel inner border for non-highlighted */}
+      {!highlighted && (
+        <div
+          className="pointer-events-none absolute inset-[3px] border border-line-soft opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Unit ID + Status */}
       <div
-        className={`text-data mb-6 flex items-center justify-between text-[11px] uppercase ${
+        className={`text-data-wide mb-6 flex items-center justify-between text-[10px] uppercase tracking-[0.12em] ${
           highlighted ? "text-void/70" : "text-bone-faint"
         }`}
       >
-        <span>UNIT.0{index + 1}</span>
+        <span className="flex items-center gap-2">
+          <span className="text-ghost-red opacity-60" aria-hidden="true">[</span>
+          UNIT.0{index + 1}
+          <span className="text-ghost-red opacity-60" aria-hidden="true">]</span>
+        </span>
         <span className="flex items-center gap-1.5">
           <span
             className={`size-1.5 rounded-full ${
               highlighted ? "bg-void animate-pulse-dot" : "bg-ghost-red animate-pulse-dot"
             }`}
+            aria-hidden="true"
           />
-          Activo
+          <span>Activo</span>
         </span>
       </div>
 
+      {/* Title + Icon */}
       <div className="mb-5 flex items-center justify-between">
         <h3
           className={`text-display text-2xl leading-none ${
@@ -87,18 +107,21 @@ function ServiceCard({
           strokeWidth="1.4"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={`size-7 shrink-0 ${highlighted ? "text-void" : "text-ghost-red"}`}
+          className={`size-7 shrink-0 transition-transform duration-300 group-hover:scale-110 ${
+            highlighted ? "text-void" : "text-ghost-red"
+          }`}
           aria-hidden="true"
         >
           <path d={iconPath} />
         </svg>
       </div>
 
+      {/* Categories */}
       <div className="flex flex-1 flex-col gap-5">
         {group.categories.map((cat) => (
           <div key={cat.heading}>
             <p
-              className={`text-data mb-2.5 text-[11px] uppercase ${
+              className={`text-data-wide mb-2.5 text-[10px] uppercase tracking-[0.1em] ${
                 highlighted ? "text-void/60" : "text-bone-faint"
               }`}
             >
@@ -116,6 +139,7 @@ function ServiceCard({
                     className={`mt-2 size-1 shrink-0 rounded-full ${
                       highlighted ? "bg-void" : "bg-ghost-red"
                     }`}
+                    aria-hidden="true"
                   />
                   {item.label}
                 </li>
@@ -125,17 +149,33 @@ function ServiceCard({
         ))}
       </div>
 
+      {/* Progress bar */}
       <div
-        className={`mt-7 h-[3px] w-full overflow-hidden ${
+        className={`mt-7 h-[2px] w-full overflow-hidden ${
           highlighted ? "bg-void/20" : "bg-line"
         }`}
+        aria-hidden="true"
       >
         <div
-          className={`h-full w-1/3 transition-[width] duration-500 ease-out group-hover:w-full ${
+          className={`h-full w-1/3 transition-[width] duration-700 ease-[var(--ease-out-expo)] group-hover:w-full ${
             highlighted ? "bg-void" : "bg-ghost-red"
           }`}
         />
       </div>
-    </div>
+
+      {/* Crosshair corner marks */}
+      <div
+        className={`absolute left-0 top-0 size-2 border-l border-t ${
+          highlighted ? "border-void/30" : "border-ghost-red/20"
+        } transition-colors duration-300 group-hover:border-ghost-red/50`}
+        aria-hidden="true"
+      />
+      <div
+        className={`absolute bottom-0 right-0 size-2 border-r border-b ${
+          highlighted ? "border-void/30" : "border-ghost-red/20"
+        } transition-colors duration-300 group-hover:border-ghost-red/50`}
+        aria-hidden="true"
+      />
+    </article>
   );
 }
