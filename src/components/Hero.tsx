@@ -51,7 +51,7 @@ export default function Hero() {
 
         {/* Headline — massive brutalist type */}
         <h1
-          className="reveal text-display text-[clamp(2.8rem,9vw,6rem)] leading-[0.88] text-bone"
+          className="reveal text-display text-[clamp(2.8rem,9vw,6rem)] leading-[1.1] text-bone"
           data-reveal-delay="100"
         >
           Mecánica de
@@ -103,10 +103,6 @@ export default function Hero() {
             <span className="size-1.5 rounded-full bg-ghost-red animate-pulse-dot" aria-hidden="true" />
             Sistema en línea
           </span>
-          <span className="text-data-wide hidden sm:inline" aria-hidden="true">///</span>
-          <span className="text-data-wide"></span>
-          <span className="text-data-wide hidden sm:inline" aria-hidden="true">///</span>
-          <span className="text-data-wide"></span>
         </div>
       </div>
 
