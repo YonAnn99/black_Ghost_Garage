@@ -12,6 +12,7 @@
     "@fontsource/inter": "^5.2.8",
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/oswald": "^5.2.8",
+    "@googlemaps/js-api-loader": "^2.1.1",
     "next": "16.2.9",
     "nodemailer": "^9.0.1",
     "react": "19.2.4",

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { contactInfo } from "@/lib/data";
 import ReviewsCarousel from "./ReviewsCarousel";
+import GoogleMap from "./GoogleMap";
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -200,7 +201,7 @@ export default function Contact() {
             </p>
             <p className="mb-5 text-sm text-bone-dim">Nuestra base de operaciones.</p>
 
-            {/* Google Maps iframe */}
+            {/* Google Maps */}
             <div className="group relative aspect-[16/10] overflow-hidden border border-line bg-panel">
               {/* Double-bezel inset */}
               <div
@@ -208,17 +209,7 @@ export default function Contact() {
                 aria-hidden="true"
               />
 
-              <iframe
-                src="https://maps.google.com/maps?q=Black+Ghost's+Garage+Nezahualcóyotl+Oxtotipac+México&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                width="100%"
-                height="100%"
-                style={{ border: 0, filter: "grayscale(1) contrast(1.1) brightness(0.6) sepia(0.3)" }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Ubicación del taller — Nezahualcóyotl Manzana 021, Oxtotipac"
-                className="absolute inset-0"
-              />
+              <GoogleMap apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ""} />
 
               {/* Overlay label */}
               <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-void via-void/80 to-transparent p-4">
