@@ -54,11 +54,11 @@ export default function Hero() {
           className="reveal text-display text-[clamp(2.8rem,9vw,6rem)] leading-[0.88] text-bone"
           data-reveal-delay="100"
         >
-          Ingeniería de
+          Mecánica de
           <br />
-          <span className="text-ghost-red">alto octanaje</span>
+          <span className="text-ghost-red">perfección pura</span>
           <br />
-          para tu vehículo.
+          Para máquinas exigentes.
         </h1>
 
         <p
@@ -66,7 +66,7 @@ export default function Hero() {
           data-reveal-delay="200"
         >
           Precisión mecánica, estética agresiva y rendimiento sin
-          compromisos. Entra al lado oscuro de la ingeniería automotriz.
+          compromisos. Entra al lado oscuro de la automotriz.
         </p>
 
         {/* CTAs — magnetic buttons */}
@@ -104,9 +104,9 @@ export default function Hero() {
             Sistema en línea
           </span>
           <span className="text-data-wide hidden sm:inline" aria-hidden="true">///</span>
-          <span className="text-data-wide">CDMX · Sector Norte</span>
+          <span className="text-data-wide"></span>
           <span className="text-data-wide hidden sm:inline" aria-hidden="true">///</span>
-          <span className="text-data-wide">Est. 2024</span>
+          <span className="text-data-wide"></span>
         </div>
       </div>
 

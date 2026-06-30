@@ -143,6 +143,8 @@ black-ghosts-garage/
 
 ## 4. Siguientes Pasos (Pendientes)
 
+### ✅ Completados
+
 - [x] ~~Refactorizar `Header.tsx` con double-bezel, hamburger magnético y stagger reveal~~
 - [x] ~~Refactorizar `About.tsx` con industrial markers y panel de stats brutalista~~
 - [x] ~~Refactorizar `Contact.tsx` con doble bezel en formulario y mapa real~~
@@ -151,8 +153,23 @@ black-ghosts-garage/
 - [x] ~~Integrar envío de emails por SMTP (Nodemailer)~~
 - [x] ~~Integrar mapa real de Google Maps / Leaflet en lugar del placeholder SVG~~
 - [x] ~~Agregar sección de galería/portfolio de trabajos realizados~~
+- [x] ~~SEO: robots.txt, sitemap, Open Graph, Twitter Cards, Structured Data~~
+
+### 🔴 Prioridad Alta (Producción)
+
+- [ ] Performance de imágenes — Usar `<Image>` de Next.js en Gallery, lazy loading, formatos WebP/AVIF
+- [ ] Seguridad — Rate limiting en `/api/contact`, sanitizar inputs, headers de seguridad (CSP, X-Frame-Options)
+
+### 🟡 Prioridad Media (UX)
+
+- [ ] Accesibilidad — Auditoría WCAG AA, skip-to-content link, focus visible en interactive elements
+- [ ] Formulario mejorado — Mensajes de error descriptivos, success state con animación, validación en tiempo real
+- [ ] Analytics — Google Analytics o Plausible, eventos de conversión (WhatsApp clicks, envío formulario)
+
+### 🟢 Prioridad Baja (Pulido)
+
 - [ ] Reemplazar SVG placeholders de Gallery con fotos reales del taller
 - [ ] Optimizar imágenes (actualmente solo 2 logos + SVGs en `/public/images/`)
-- [ ] Auditar contraste completo (WCAG AA) en todos los componentes
-- [ ] Revisar SEO: sitemap, robots.txt, structured data
+- [ ] Contenido real — Textos finales en About/Services, testimonios de clientes
 - [ ] Configurar `.env.local` con credenciales SMTP reales para producción
+- [ ] 404 page personalizada con estilo industrial

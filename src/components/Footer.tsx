@@ -36,7 +36,7 @@ export default function Footer() {
             <div className="flex items-center gap-3 text-[10px] text-bone-faint">
               <span className="text-data-wide tracking-[0.1em]" aria-hidden="true">©</span>
               <span className="text-data-wide tracking-[0.08em]">
-                {new Date().getFullYear()} Black Ghost&apos;s Garage. Todos los derechos reservados.
+                {new Date().getFullYear()}  Black Ghost&apos;s Garage. Todos los derechos reservados.
               </span>
             </div>
           </div>
@@ -76,10 +76,10 @@ export default function Footer() {
         {/* Bottom bar — industrial telemetry strip */}
         <div className="mt-10 flex flex-col items-center gap-3 border-t border-line-soft pt-8 sm:flex-row sm:justify-between">
           <span className="text-data-wide text-[9px] uppercase text-bone-faint tracking-[0.12em]" aria-hidden="true">
-            [SYS.SHUTDOWN] — CDMX · Sector Norte
+            
           </span>
           <span className="text-data-wide text-[9px] uppercase text-bone-faint tracking-[0.12em]" aria-hidden="true">
-            EST.2024 — REV.01
+            
           </span>
         </div>
       </div>
