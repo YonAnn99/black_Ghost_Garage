@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { contactInfo } from "@/lib/data";
 import ReviewsCarousel from "./ReviewsCarousel";
+
+const Map = dynamic(() => import("./Map"), { ssr: false });
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -200,7 +203,7 @@ export default function Contact() {
             </p>
             <p className="mb-5 text-sm text-bone-dim">Nuestra base de operaciones.</p>
 
-            {/* Google Maps iframe */}
+            {/* Map */}
             <div className="group relative aspect-[16/10] overflow-hidden border border-line bg-panel">
               {/* Double-bezel inset */}
               <div
@@ -208,34 +211,7 @@ export default function Contact() {
                 aria-hidden="true"
               />
 
-              <iframe
-                src="https://maps.google.com/maps?q=Black+Ghost's+Garage+Nezahualcóyotl+Oxtotipac+México&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                width="100%"
-                height="100%"
-                style={{ border: 0, filter: "grayscale(1) contrast(1.1) brightness(0.6) sepia(0.3)" }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Ubicación del taller — Nezahualcóyotl Manzana 021, Oxtotipac"
-                className="absolute inset-0"
-              />
-
-              {/* Overlay label */}
-              <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-void via-void/80 to-transparent p-4">
-                <div className="flex items-center gap-2">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="size-4 text-ghost-red"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 2c-4.2 0-7.5 3.3-7.5 7.5 0 5.6 6.3 11.5 7 12.1.3.3.7.3 1 0 .7-.6 7-6.5 7-12.1C19.5 5.3 16.2 2 12 2Zm0 10.2a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4Z" />
-                  </svg>
-                  <span className="text-data-wide text-[10px] uppercase text-bone tracking-[0.1em]">
-                    Ver en Google Maps
-                  </span>
-                </div>
-              </div>
+              <Map />
 
               {/* Crosshair corners */}
               <div className="absolute left-0 top-0 z-10 size-3 border-l border-t border-ghost-red/30" aria-hidden="true" />
