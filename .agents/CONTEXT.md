@@ -32,6 +32,7 @@
 | 2026-06-28 | Logo footer actualizado | `Footer.tsx` cambiado de `ghost-logo.svg` a `ghost-logo.png` |
 | 2026-06-28 | **SEO completo implementado** | `robots.txt`, `sitemap.ts`, Open Graph, Twitter Cards, Structured Data JSON-LD (AutoRepair) |
 | 2026-06-30 | **Carrusel de reseñas Google Maps** | Nuevo componente `ReviewsCarousel.tsx` con 8 reseñas verificadas (4-5 estrellas), carrusel infinito CSS, pausa al hover, estilo industrial double-bezel. Integrado debajo del formulario en `Contact.tsx`. |
+| 2026-06-30 | **Mapa Google Maps arreglado** | Reemplazado iframe (bloqueado) con JavaScript API. Nuevo `GoogleMap.tsx` con mapa dark theme, marker rojo, fallback a link directo. API key en `.env.local`. |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 
@@ -100,12 +101,13 @@ black-ghosts-garage/
 │   │   ├── About.tsx           # Stats + copy
 │   │   ├── Contact.tsx         # Formulario + mapa + horarios + carrusel reseñas (client)
 │   │   ├── ReviewsCarousel.tsx  # Carrusel infinito reseñas Google Maps (client)
+│   │   ├── GoogleMap.tsx        # Mapa dinámico Google Maps JS API (client)
 │   │   ├── Footer.tsx          # Pie de página
 │   │   └── RevealProvider.tsx  # Wrapper scroll-reveal (client)
 │   └── lib/
 │       ├── data.ts             # Datos estáticos (servicios, nav, contacto, galería)
 │       └── useScrollReveal.ts  # Hook IntersectionObserver
-├── .env.local                  # Credenciales SMTP (no commitear)
+├── .env.local                  # Credenciales SMTP + Google Maps API key (no commitear)
 ├── public/
 │   ├── robots.txt              # Reglas para crawlers + sitemap URL
 │   └── images/
