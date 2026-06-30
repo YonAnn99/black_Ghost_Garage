@@ -51,7 +51,7 @@ export default function Hero() {
 
         {/* Headline — massive brutalist type */}
         <h1
-          className="reveal text-display text-[clamp(2.8rem,9vw,6rem)] leading-[1.2] text-bone"
+          className="reveal text-display text-[clamp(2.8rem,9vw,6rem)] leading-[1.35] text-bone"
           data-reveal-delay="100"
         >
           Mecánica de

@@ -209,7 +209,7 @@ export default function Contact() {
                 aria-hidden="true"
               />
 
-              <GoogleMap apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ""} />
+              <GoogleMap />
 
               {/* Overlay label */}
               <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-void via-void/80 to-transparent p-4">
