@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { contactInfo } from "@/lib/data";
+import ReviewsCarousel from "./ReviewsCarousel";
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -276,6 +277,8 @@ export default function Contact() {
             </div>
           </div>
         </div>
+
+        <ReviewsCarousel />
       </div>
     </section>
   );

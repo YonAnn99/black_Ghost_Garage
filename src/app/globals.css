@@ -304,3 +304,39 @@
     transition-duration: 100ms;
   }
 }
+
+/* ===========================
+   REVIEWS CAROUSEL
+   =========================== */
+
+@keyframes scroll-reviews {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.reviews-scroll {
+  animation: scroll-reviews 40s linear infinite;
+}
+
+.group:hover .reviews-scroll {
+  animation-play-state: paused;
+}
+
+.review-card {
+  transition: border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.review-card:hover {
+  border-color: var(--color-ghost-red);
+  box-shadow: 0 0 20px rgba(232, 48, 42, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reviews-scroll {
+    animation: none;
+  }
+}
