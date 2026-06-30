@@ -32,7 +32,9 @@
 | 2026-06-28 | Logo footer actualizado | `Footer.tsx` cambiado de `ghost-logo.svg` a `ghost-logo.png` |
 | 2026-06-28 | **SEO completo implementado** | `robots.txt`, `sitemap.ts`, Open Graph, Twitter Cards, Structured Data JSON-LD (AutoRepair) |
 | 2026-06-30 | **Carrusel de reseñas Google Maps** | Nuevo componente `ReviewsCarousel.tsx` con 8 reseñas verificadas (4-5 estrellas), carrusel infinito CSS, pausa al hover, estilo industrial double-bezel. Integrado debajo del formulario en `Contact.tsx`. |
-| 2026-06-30 | **Mapa Google Maps arreglado** | Reemplazado iframe (bloqueado) con JavaScript API. Nuevo `GoogleMap.tsx` con mapa dark theme, marker rojo, fallback a link directo. API key en `.env.local`. |
+| 2026-06-30 | **Mapa restaurado** | Mapa SVG placeholder funcional (iframe de Google Maps bloqueado). Click abre Google Maps directamente. |
+| 2026-06-30 | **Formulario mejorado** | Validación en tiempo real (blur + change), mensajes de error descriptivos por campo, animación success con checkmark, loading spinner, banner de error del servidor, reset completo al enviar otra transmisión. |
+| 2026-06-30 | **Analytics Plausible** | Integrado Plausible Analytics (privacy-friendly). Eventos custom: `Contact Form Submitted` (con vehículo), `WhatsApp Click` (con source). Utility reutilizable en `lib/analytics.ts`. |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 
@@ -46,7 +48,7 @@
 | `page.tsx` | Gallery inserto entre Services y About. Import añadido. |
 | `Header.tsx` | **REFACTOR** — Logo double-bezel (borde + padding + glow). Hamburger magnético con morphing a X usando `--ease-spring`. Nav desktop con `btn-press`. Mobile menu con stagger reveal (delay escalonado 100+idx*50ms). Corner accents en botón hamburguesa. `aria-controls`, `aria-expanded`. Nav links con prefijo `[0X]`. CTA con dot animado. `backdrop-blur-xl`. |
 | `About.tsx` | **REFACTOR** — Headline con acento rojo en segunda línea. Stats panel con double-bezel inset. Unit IDs `[STAT.0X]` en cada stat. Crosshair corners. Badges industriales. Protocol link con flecha en cuadrado. `aria-labelledby` en sección. |
-| `Contact.tsx` | **REFACTOR** — Formulario dentro de card con double-bezel inset + crosshair corners. Header del form con dot pulsante y `[REQUIRED]`. Inputs con `bg-void` y focus rojo. Botón submit con icono anidado. **Mapa real Google Maps** (iframe embed de CDMX, filtro grayscale+sepia). Overlay label sobre mapa. Crosshair corners en mapa. `aria-labelledby` en sección. **POST a `/api/contact`** con loading state, error handling, `role="alert"`. |
+| `Contact.tsx` | **REFACTOR** — Formulario con validación en tiempo real, errores descriptivos, animación success. Mapa SVG placeholder. Carrusel de reseñas integrado. Analytics events (form submit, WhatsApp click). |
 | `Footer.tsx` | **REFACTOR** — Logo con double-bezel. Copyright con `[©]`. Links legales y sociales con `btn-press`. Bottom bar con telemetry strip `[SYS.SHUTDOWN]`. `role="contentinfo"`. Background `#080302`. |
 | `api/contact/route.ts` | **NUEVO** — API POST con validación de campos requeridos. Nodemailer transporter SMTP. Email HTML con estilo industrial (fondo negro, borde rojo, tipografía monospace). ID de transmisión `BG-xxxx`. Logging con `[CONTACT]` prefix. |
 | `data.ts` | **ACTUALIZADO** — WhatsApp: `+52 56 3536 3577` en `whatsappUrl` y `whatsappNumber`. |
@@ -99,15 +101,15 @@ black-ghosts-garage/
 │   │   ├── Services.tsx        # Grid 3 tarjetas diagnóstico
 │   │   ├── Gallery.tsx         # Portafolio de trabajos con filtros (client)
 │   │   ├── About.tsx           # Stats + copy
-│   │   ├── Contact.tsx         # Formulario + mapa + horarios + carrusel reseñas (client)
+│   │   ├── Contact.tsx         # Formulario validado + mapa SVG + carrusel reseñas (client)
 │   │   ├── ReviewsCarousel.tsx  # Carrusel infinito reseñas Google Maps (client)
-│   │   ├── GoogleMap.tsx        # Mapa dinámico Google Maps JS API (client)
 │   │   ├── Footer.tsx          # Pie de página
 │   │   └── RevealProvider.tsx  # Wrapper scroll-reveal (client)
 │   └── lib/
 │       ├── data.ts             # Datos estáticos (servicios, nav, contacto, galería)
+│       ├── analytics.ts        # Utility Plausible events (form submit, WhatsApp click)
 │       └── useScrollReveal.ts  # Hook IntersectionObserver
-├── .env.local                  # Credenciales SMTP + Google Maps API key (no commitear)
+├── .env.local                  # Credenciales SMTP (no commitear)
 ├── public/
 │   ├── robots.txt              # Reglas para crawlers + sitemap URL
 │   └── images/
@@ -166,9 +168,9 @@ black-ghosts-garage/
 
 ### 🟡 Prioridad Media (UX)
 
+- [x] ~~Formulario mejorado — Mensajes de error descriptivos, success state con animación, validación en tiempo real~~
+- [x] ~~Analytics — Plausible, eventos de conversión (WhatsApp clicks, envío formulario)~~
 - [ ] Accesibilidad — Auditoría WCAG AA, skip-to-content link, focus visible en interactive elements
-- [ ] Formulario mejorado — Mensajes de error descriptivos, success state con animación, validación en tiempo real
-- [ ] Analytics — Google Analytics o Plausible, eventos de conversión (WhatsApp clicks, envío formulario)
 
 ### 🟢 Prioridad Baja (Pulido)
 
