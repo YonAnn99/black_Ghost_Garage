@@ -79,6 +79,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        <script
+          defer
+          data-domain="black-ghost-garage.vercel.app"
+          src="https://plausible.io/js/script.tagged-events.js"
+        />
+      </head>
       <body className="bg-void text-bone antialiased">{children}</body>
     </html>
   );

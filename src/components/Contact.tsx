@@ -1,15 +1,111 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { contactInfo } from "@/lib/data";
+import { trackEvent } from "@/lib/analytics";
 import ReviewsCarousel from "./ReviewsCarousel";
+
+type FieldErrors = {
+  nombre?: string;
+  vehiculo?: string;
+  descripcion?: string;
+};
+
+type FormValues = {
+  nombre: string;
+  vehiculo: string;
+  anio: string;
+  descripcion: string;
+};
+
+function validate(values: FormValues): FieldErrors {
+  const errors: FieldErrors = {};
+
+  if (!values.nombre.trim()) {
+    errors.nombre = "El nombre es obligatorio.";
+  } else if (values.nombre.trim().length < 2) {
+    errors.nombre = "El nombre debe tener al menos 2 caracteres.";
+  }
+
+  if (!values.vehiculo.trim()) {
+    errors.vehiculo = "El vehículo es obligatorio.";
+  } else if (values.vehiculo.trim().length < 3) {
+    errors.vehiculo = "Ingresa marca y modelo del vehículo.";
+  }
+
+  if (!values.descripcion.trim()) {
+    errors.descripcion = "La descripción es obligatoria.";
+  } else if (values.descripcion.trim().length < 10) {
+    errors.descripcion = "Describe el requerimiento con más detalle (mín. 10 caracteres).";
+  }
+
+  return errors;
+}
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [values, setValues] = useState<FormValues>({
+    nombre: "",
+    vehiculo: "",
+    anio: "",
+    descripcion: "",
+  });
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const errors = validate(values);
+  const isValid = Object.keys(errors).length === 0;
+
+  const handleChange = useCallback(
+    (field: keyof FormValues, value: string) => {
+      setValues((prev) => ({ ...prev, [field]: value }));
+      setServerError(null);
+    },
+    []
+  );
+
+  const handleBlur = useCallback((field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitted(true);
+    setServerError(null);
+
+    const allTouched = { nombre: true, vehiculo: true, descripcion: true };
+    setTouched(allTouched);
+
+    if (!isValid) return;
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: values.nombre.trim(),
+          vehiculo: values.vehiculo.trim(),
+          anio: values.anio.trim() || undefined,
+          descripcion: values.descripcion.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.ok) {
+        setServerError(data.error || "Error al enviar. Intenta de nuevo.");
+        return;
+      }
+
+      setSubmitted(true);
+      trackEvent("Contact Form Submitted", { vehicle: values.vehiculo.trim() });
+    } catch {
+      setServerError("No se pudo conectar con el servidor. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -32,9 +128,14 @@ export default function Contact() {
           {/* Form */}
           <div className="reveal" data-reveal-delay="100">
             {submitted ? (
-              <div className="flex h-full min-h-[420px] flex-col items-center justify-center border border-line bg-panel p-10 text-center">
-                <span className="size-2 rounded-full bg-ghost-red animate-pulse-dot" />
-                <p className="text-display mt-5 text-xl text-bone">
+              <div className="flex h-full min-h-[420px] flex-col items-center justify-center border border-line bg-panel p-10 text-center animate-system-boot">
+                <div className="relative">
+                  <span className="absolute -inset-3 rounded-full bg-ghost-red/20 animate-pulse-dot" />
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="size-10 text-ghost-red">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </div>
+                <p className="text-display mt-6 text-2xl text-bone">
                   Transmisión enviada
                 </p>
                 <p className="mt-3 max-w-xs text-sm leading-relaxed text-bone-dim">
@@ -43,34 +144,50 @@ export default function Contact() {
                 </p>
                 <button
                   type="button"
-                  onClick={() => setSubmitted(false)}
+                  onClick={() => {
+                    setSubmitted(false);
+                    setValues({ nombre: "", vehiculo: "", anio: "", descripcion: "" });
+                    setTouched({});
+                  }}
                   className="text-data mt-7 border-b border-ghost-red pb-1 text-[12px] uppercase text-bone-dim hover:text-bone"
                 >
                   Enviar otra transmisión
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                <Field label="Nombre / Piloto" htmlFor="nombre">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
+                <Field label="Nombre / Piloto" htmlFor="nombre" error={touched.nombre ? errors.nombre : undefined}>
                   <input
                     id="nombre"
                     name="nombre"
                     type="text"
-                    required
                     placeholder="Ingresa tu nombre"
-                    className="w-full border border-line bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:border-ghost-red focus:outline-none"
+                    value={values.nombre}
+                    onChange={(e) => handleChange("nombre", e.target.value)}
+                    onBlur={() => handleBlur("nombre")}
+                    className={`w-full border bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:outline-none transition-colors ${
+                      touched.nombre && errors.nombre
+                        ? "border-ghost-red focus:border-ghost-red"
+                        : "border-line focus:border-ghost-red"
+                    }`}
                   />
                 </Field>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <Field label="Vehículo (marca/modelo)" htmlFor="vehiculo">
+                  <Field label="Vehículo (marca/modelo)" htmlFor="vehiculo" error={touched.vehiculo ? errors.vehiculo : undefined}>
                     <input
                       id="vehiculo"
                       name="vehiculo"
                       type="text"
-                      required
                       placeholder="Ej. Ford Mustang"
-                      className="w-full border border-line bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:border-ghost-red focus:outline-none"
+                      value={values.vehiculo}
+                      onChange={(e) => handleChange("vehiculo", e.target.value)}
+                      onBlur={() => handleBlur("vehiculo")}
+                      className={`w-full border bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:outline-none transition-colors ${
+                        touched.vehiculo && errors.vehiculo
+                          ? "border-ghost-red focus:border-ghost-red"
+                          : "border-line focus:border-ghost-red"
+                      }`}
                     />
                   </Field>
                   <Field label="Año" htmlFor="anio">
@@ -80,33 +197,62 @@ export default function Contact() {
                       type="text"
                       inputMode="numeric"
                       placeholder="Ej. 2023"
+                      value={values.anio}
+                      onChange={(e) => handleChange("anio", e.target.value)}
                       className="w-full border border-line bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:border-ghost-red focus:outline-none"
                     />
                   </Field>
                 </div>
 
-                <Field label="Descripción del requerimiento" htmlFor="descripcion">
+                <Field label="Descripción del requerimiento" htmlFor="descripcion" error={touched.descripcion ? errors.descripcion : undefined}>
                   <textarea
                     id="descripcion"
                     name="descripcion"
                     rows={4}
-                    required
                     placeholder="Describe el servicio, falla o modificación requerida…"
-                    className="w-full resize-none border border-line bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:border-ghost-red focus:outline-none"
+                    value={values.descripcion}
+                    onChange={(e) => handleChange("descripcion", e.target.value)}
+                    onBlur={() => handleBlur("descripcion")}
+                    className={`w-full resize-none border bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:outline-none transition-colors ${
+                      touched.descripcion && errors.descripcion
+                        ? "border-ghost-red focus:border-ghost-red"
+                        : "border-line focus:border-ghost-red"
+                    }`}
                   />
                 </Field>
+
+                {serverError && (
+                  <div className="flex items-center gap-2 rounded border border-ghost-red/30 bg-ghost-red/10 px-4 py-3 text-[13px] text-ghost-red">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="size-4 shrink-0">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                    </svg>
+                    {serverError}
+                  </div>
+                )}
 
                 <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center">
                   <button
                     type="submit"
-                    className="text-data inline-flex items-center justify-center gap-2 bg-ghost-red px-7 py-3.5 text-[13px] uppercase text-void transition-colors hover:bg-bone"
+                    disabled={loading}
+                    className="text-data inline-flex items-center justify-center gap-2 bg-ghost-red px-7 py-3.5 text-[13px] uppercase text-void transition-colors hover:bg-bone disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Enviar transmisión
+                    {loading ? (
+                      <>
+                        <svg className="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Transmitiendo...
+                      </>
+                    ) : (
+                      "Enviar transmisión"
+                    )}
                   </button>
                   <a
                     href={contactInfo.whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackEvent("WhatsApp Click", { source: "contact_form" })}
                     className="text-data inline-flex items-center justify-center gap-2 border border-line px-7 py-3.5 text-[13px] uppercase text-bone-dim transition-colors hover:border-bone hover:text-bone"
                   >
                     <svg
@@ -214,10 +360,12 @@ export default function Contact() {
 function Field({
   label,
   htmlFor,
+  error,
   children,
 }: {
   label: string;
   htmlFor: string;
+  error?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -229,6 +377,14 @@ function Field({
         {label}
       </label>
       {children}
+      {error && (
+        <p className="flex items-center gap-1.5 text-[12px] text-ghost-red">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="size-3 shrink-0">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+          </svg>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
