@@ -1,102 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 interface GoogleMapProps {
   apiKey: string;
 }
 
-declare global {
-  interface Window {
-    initMap?: () => void;
-    google?: {
-      maps?: {
-        Map: new (element: HTMLElement, options: object) => object;
-        Marker: new (options: object) => object;
-        LatLngLiteral: { lat: number; lng: number };
-      };
-    };
-  }
-}
-
 export default function GoogleMap({ apiKey }: GoogleMapProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [error, setError] = useState(false);
+  const [iframeError, setIframeError] = useState(false);
 
-  useEffect(() => {
-    if (!mapRef.current || !apiKey) {
-      setError(true);
-      return;
-    }
+  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=Black+Ghost's+Garage,Nezahualcóyotl,Oxtotipac,México&zoom=15&maptype=satellite`;
 
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
-    script.async = true;
-    script.defer = true;
-
-    window.initMap = () => {
-      if (!mapRef.current || !window.google?.maps) {
-        setError(true);
-        return;
-      }
-
-      try {
-        const map = new window.google.maps.Map(mapRef.current, {
-          center: { lat: 19.3985, lng: -99.0283 },
-          zoom: 15,
-          disableDefaultUI: true,
-          zoomControl: false,
-          streetViewControl: false,
-          mapTypeControl: false,
-          fullscreenControl: false,
-          gestureHandling: "cooperative",
-          styles: [
-            { elementType: "geometry", stylers: [{ color: "#212121" }] },
-            { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-            { elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
-            { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
-            { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#757575" }] },
-            { featureType: "administrative.country", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
-            { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#1a1a1a" }] },
-            { featureType: "poi", elementType: "geometry", stylers: [{ color: "#282828" }] },
-            { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
-            { featureType: "road", elementType: "geometry.fill", stylers: [{ color: "#2c2c2c" }] },
-            { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#8a8a8a" }] },
-            { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#373737" }] },
-            { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#3c3c3c" }] },
-            { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
-            { featureType: "transit", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
-            { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] },
-            { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#3d3d3d" }] },
-          ],
-        });
-
-        new window.google.maps.Marker({
-          position: { lat: 19.3985, lng: -99.0283 },
-          map,
-          title: "Black Ghost's Garage",
-          icon: {
-            path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
-            fillColor: "#e8302a",
-            fillOpacity: 1,
-            strokeWeight: 0,
-            scale: 1.5,
-          },
-        });
-      } catch {
-        setError(true);
-      }
-    };
-
-    script.onerror = () => setError(true);
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, [apiKey]);
-
-  if (error) {
+  if (iframeError || !apiKey) {
     return (
       <a
         href="https://maps.google.com/maps?q=Black+Ghost's+Garage+Nezahualcóyotl+Oxtotipac+México"
@@ -120,5 +35,18 @@ export default function GoogleMap({ apiKey }: GoogleMapProps) {
     );
   }
 
-  return <div ref={mapRef} className="h-full min-h-[300px] w-full" />;
+  return (
+    <iframe
+      src={mapUrl}
+      width="100%"
+      height="100%"
+      style={{ border: 0, filter: "grayscale(1) contrast(1.1) brightness(0.6) sepia(0.3)" }}
+      allowFullScreen
+      loading="lazy"
+      referrerPolicy="no-referrer-when-downgrade"
+      title="Ubicación del taller — Black Ghost's Garage"
+      className="absolute inset-0"
+      onError={() => setIframeError(true)}
+    />
+  );
 }
