@@ -8,7 +8,7 @@
 
 **Black Ghost's Garage** es una landing page single-page para un taller mecánico especializado en Ciudad de México. Estética **noir industrial brutalista**: fondo negro absoluto (`#0a0a0a`), acento rojo fantasma (`#e8302a`), texto hueso (`#f5f3ef`). El sitio transmite una atmósfera de **panel de diagnóstico militar** con scanlines CRT, grid sutil, esquinas HUD y animaciones de reveal al scroll con blur de entrada.
 
-**Secciones activas:** Header (fijo, blur, hamburger magnético + stagger reveal), Hero (fullscreen con double-bezel emblem + CTAs magnéticos + HUD telemetry), Services (3 tarjetas de diagnóstico con double-bezel + crosshairs), Gallery (portafolio de trabajos con filtros + cards industrial), About (panel de stats brutalista + industrial markers), Contact (formulario double-bezel + mapa real Google Maps + horarios), Footer (tipografía industrial + telemetry strip).
+**Secciones activas:** Header (fijo, blur, hamburger magnético + stagger reveal), Hero (fullscreen con double-bezel emblem + CTAs magnéticos + HUD telemetry), Services (3 tarjetas de diagnóstico con double-bezel + crosshairs), Gallery (portafolio de trabajos con filtros + cards industrial), About (panel de stats brutalista + industrial markers), Contact (formulario double-bezel + mapa real Google Maps + horarios + **carrusel de reseñas Google Maps**), Footer (tipografía industrial + telemetry strip).
 
 **Estado:** Todos los componentes refactorizados con diseño industrial-brutalist consistente. El sitio tiene cohesión visual completa.
 
@@ -31,6 +31,7 @@
 | 2026-06-28 | Favicon personalizado | `src/app/icon.png` — Logo ghost para pestaña del navegador (Next.js App Router metadata) |
 | 2026-06-28 | Logo footer actualizado | `Footer.tsx` cambiado de `ghost-logo.svg` a `ghost-logo.png` |
 | 2026-06-28 | **SEO completo implementado** | `robots.txt`, `sitemap.ts`, Open Graph, Twitter Cards, Structured Data JSON-LD (AutoRepair) |
+| 2026-06-30 | **Carrusel de reseñas Google Maps** | Nuevo componente `ReviewsCarousel.tsx` con 8 reseñas verificadas (4-5 estrellas), carrusel infinito CSS, pausa al hover, estilo industrial double-bezel. Integrado debajo del formulario en `Contact.tsx`. |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 
@@ -97,7 +98,8 @@ black-ghosts-garage/
 │   │   ├── Services.tsx        # Grid 3 tarjetas diagnóstico
 │   │   ├── Gallery.tsx         # Portafolio de trabajos con filtros (client)
 │   │   ├── About.tsx           # Stats + copy
-│   │   ├── Contact.tsx         # Formulario + mapa + horarios (client)
+│   │   ├── Contact.tsx         # Formulario + mapa + horarios + carrusel reseñas (client)
+│   │   ├── ReviewsCarousel.tsx  # Carrusel infinito reseñas Google Maps (client)
 │   │   ├── Footer.tsx          # Pie de página
 │   │   └── RevealProvider.tsx  # Wrapper scroll-reveal (client)
 │   └── lib/
