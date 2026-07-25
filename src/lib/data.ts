@@ -109,7 +109,7 @@ export const equipmentItems: EquipmentItem[] = [
     category: "Diagnóstico",
     description:
       "Scanner profesional con acceso a todas las marcas y módulos. Diagnóstico de motor, transmisión, ABS, airbags y sistemas avanzados de asistencia.",
-    image: null,
+    image: "/images/equipment/scanner-placeholder.svg",
   },
   {
     id: "eq-005",
@@ -125,7 +125,7 @@ export const equipmentItems: EquipmentItem[] = [
     category: "Suspensión",
     description:
       "Balancín hidráulico para alineación y balanceo de suspensión. Verifica simetría del chasis y detecta deformaciones estructurales.",
-    image: null,
+    image: "/images/equipment/balancer-placeholder.svg",
   },
 ];
 

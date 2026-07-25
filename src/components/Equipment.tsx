@@ -331,9 +331,9 @@ function EquipmentCard({
         {/* FRONT - Description */}
         <article
           className={`card-flip-front group relative flex flex-col border border-line bg-void p-5 transition-all duration-300 hover:border-bone-faint overflow-hidden ${
-            hasImage && isTouchDevice ? "tap-feedback cursor-pointer" : ""
+            isTouchDevice ? "tap-feedback cursor-pointer" : ""
           }`}
-          onClick={() => hasImage && onFlip(item.id)}
+          onClick={() => onFlip(item.id)}
           onMouseEnter={() => !isTouchDevice && onHoverStart(item.id)}
           onMouseLeave={() => !isTouchDevice && onHoverEnd()}
           aria-label={item.name}
@@ -376,7 +376,7 @@ function EquipmentCard({
           </p>
 
           {/* Eye indicator (mobile only) */}
-          {hasImage && isTouchDevice && (
+          {isTouchDevice && (
             <div className="eye-indicator mt-4 flex items-center justify-center gap-2 text-[10px] uppercase text-ghost-red/60">
               <svg
                 viewBox="0 0 24 24"
@@ -390,7 +390,7 @@ function EquipmentCard({
                 <path d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                 <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
               </svg>
-              Ver imagen
+              Ver más
             </div>
           )}
 
@@ -404,61 +404,81 @@ function EquipmentCard({
 
         {/* BACK - Image */}
         <article
-          className={`card-flip-back group relative flex flex-col border border-ghost-red/30 bg-void overflow-hidden ${
-            hasImage && isTouchDevice ? "tap-feedback cursor-pointer" : ""
+          className={`card-flip-back group relative flex flex-col border border-ghost-red/30 bg-void ${
+            isTouchDevice ? "tap-feedback cursor-pointer" : ""
           }`}
-          onClick={() => hasImage && onFlip(item.id)}
+          onClick={() => onFlip(item.id)}
         >
-          {item.image && (
-            <>
-              <img
-                src={item.image}
-                alt={item.name}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-void via-void/20 to-transparent" />
-
-              {/* Scanline effect */}
-              <div className="absolute inset-0 bg-scanlines opacity-[0.05]" />
-
-              {/* Content overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-5">
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="size-1.5 rounded-full bg-ghost-red animate-pulse-dot" />
-                  <span className="text-data-wide text-[9px] uppercase tracking-[0.12em] text-ghost-red">
-                    {item.category}
-                  </span>
-                </div>
-                <h3 className="text-display text-lg leading-tight text-bone">
-                  {item.name}
-                </h3>
-              </div>
-
-              {/* Flip back indicator */}
-              <div className="absolute top-3 right-3">
-                <span className="eye-indicator flex items-center gap-1.5 text-[9px] uppercase text-bone/60 bg-void/60 px-2 py-1 backdrop-blur-sm">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="size-3"
-                  >
-                    <path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
-                  </svg>
-                  Voltear
-                </span>
-              </div>
-
-              {/* Corner accents */}
-              <div className="absolute left-0 top-0 size-3 border-l-2 border-t-2 border-ghost-red/40" />
-              <div className="absolute bottom-0 right-0 size-3 border-r-2 border-b-2 border-ghost-red/40" />
-            </>
+          {item.image ? (
+            <img
+              src={item.image}
+              alt={item.name}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            /* Placeholder industrial para equipos sin foto */
+            <div className="flex h-full w-full flex-col items-center justify-center bg-panel p-6 text-center">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mb-3 size-12 text-ghost-red/30"
+              >
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+              </svg>
+              <span className="text-data-wide text-[10px] uppercase tracking-widest text-bone-faint">
+                Equipo disponible
+              </span>
+              <span className="mt-1 text-[11px] text-bone-dim/60">
+                {item.name}
+              </span>
+            </div>
           )}
+
+          {/* Gradient overlay */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void via-void/20 to-transparent" />
+
+          {/* Scanline effect */}
+          <div className="pointer-events-none absolute inset-0 bg-scanlines opacity-[0.05]" />
+
+          {/* Content overlay */}
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 p-5">
+            <div className="mb-2 flex items-center gap-2">
+              <span className="size-1.5 rounded-full bg-ghost-red animate-pulse-dot" />
+              <span className="text-data-wide text-[9px] uppercase tracking-[0.12em] text-ghost-red">
+                {item.category}
+              </span>
+            </div>
+            <h3 className="text-display text-lg leading-tight text-bone">
+              {item.name}
+            </h3>
+          </div>
+
+          {/* Flip back indicator */}
+          <div className="absolute top-3 right-3">
+            <span className="eye-indicator flex items-center gap-1.5 text-[9px] uppercase text-bone/60 bg-void/60 px-2 py-1 backdrop-blur-sm">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-3"
+              >
+                <path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+              </svg>
+              Voltear
+            </span>
+          </div>
+
+          {/* Corner accents */}
+          <div className="pointer-events-none absolute left-0 top-0 size-3 border-l-2 border-t-2 border-ghost-red/40" />
+          <div className="pointer-events-none absolute bottom-0 right-0 size-3 border-r-2 border-b-2 border-ghost-red/40" />
         </article>
       </div>
     </div>

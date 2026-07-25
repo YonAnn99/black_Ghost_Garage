@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" fill="#0a0a0a"/>
+  <rect x="1" y="1" width="398" height="298" stroke="#e8302a" stroke-opacity="0.2" stroke-width="1"/>
+  
+  <!-- Grid lines -->
+  <line x1="0" y1="75" x2="400" y2="75" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="0" y1="150" x2="400" y2="150" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="0" y1="225" x2="400" y2="225" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="100" y1="0" x2="100" y2="300" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="200" y1="0" x2="200" y2="300" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="300" y1="0" x2="300" y2="300" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  
+  <!-- Scanner device -->
+  <rect x="120" y="60" width="160" height="100" rx="4" fill="#131313" stroke="#e8302a" stroke-opacity="0.4" stroke-width="1.5"/>
+  <rect x="130" y="70" width="140" height="50" rx="2" fill="#0a0a0a" stroke="#f5f3ef" stroke-opacity="0.1" stroke-width="0.5"/>
+  
+  <!-- Screen content -->
+  <rect x="140" y="80" width="30" height="4" fill="#e8302a" opacity="0.6"/>
+  <rect x="140" y="90" width="50" height="3" fill="#f5f3ef" opacity="0.2"/>
+  <rect x="140" y="98" width="40" height="3" fill="#f5f3ef" opacity="0.15"/>
+  <rect x="140" y="106" width="60" height="3" fill="#f5f3ef" opacity="0.1"/>
+  
+  <!-- Screen graph -->
+  <polyline points="200,105 210,95 220,100 230,85 240,90 250,80 260,88" stroke="#e8302a" stroke-opacity="0.5" stroke-width="1" fill="none"/>
+  
+  <!-- Buttons -->
+  <circle cx="150" cy="140" r="4" fill="#e8302a" opacity="0.4"/>
+  <circle cx="170" cy="140" r="4" fill="#f5f3ef" opacity="0.15"/>
+  <circle cx="190" cy="140" r="4" fill="#f5f3ef" opacity="0.15"/>
+  
+  <!-- Cable -->
+  <path d="M200 160 Q200 180 220 190 Q240 200 240 220" stroke="#f5f3ef" stroke-opacity="0.2" stroke-width="2" fill="none"/>
+  <rect x="232" y="218" width="16" height="24" rx="2" fill="#131313" stroke="#f5f3ef" stroke-opacity="0.2" stroke-width="0.5"/>
+  
+  <!-- Corner accents -->
+  <path d="M0 20 L0 0 L20 0" stroke="#e8302a" stroke-opacity="0.4" stroke-width="2" fill="none"/>
+  <path d="M380 300 L400 300 L400 280" stroke="#e8302a" stroke-opacity="0.4" stroke-width="2" fill="none"/>
+  
+  <!-- Label -->
+  <text x="200" y="270" text-anchor="middle" font-family="monospace" font-size="10" fill="#f5f3ef" opacity="0.3" letter-spacing="0.15em">OBD2 DIAGNOSTIC SCANNER</text>
+  
+  <!-- Scanline overlay -->
+  <line x1="0" y1="0" x2="400" y2="0" stroke="#f5f3ef" stroke-opacity="0.02" stroke-width="1"/>
+  <line x1="0" y1="2" x2="400" y2="2" stroke="#f5f3ef" stroke-opacity="0.02" stroke-width="1"/>
+  <line x1="0" y1="4" x2="400" y2="4" stroke="#f5f3ef" stroke-opacity="0.02" stroke-width="1"/>
+</svg>

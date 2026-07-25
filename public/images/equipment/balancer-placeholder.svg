@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" fill="#0a0a0a"/>
+  <rect x="1" y="1" width="398" height="298" stroke="#e8302a" stroke-opacity="0.2" stroke-width="1"/>
+  
+  <!-- Grid lines -->
+  <line x1="0" y1="75" x2="400" y2="75" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="0" y1="150" x2="400" y2="150" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="0" y1="225" x2="400" y2="225" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="100" y1="0" x2="100" y2="300" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="200" y1="0" x2="200" y2="300" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  <line x1="300" y1="0" x2="300" y2="300" stroke="#e8302a" stroke-opacity="0.05" stroke-width="0.5"/>
+  
+  <!-- Machine body -->
+  <rect x="140" y="50" width="120" height="160" rx="3" fill="#131313" stroke="#e8302a" stroke-opacity="0.3" stroke-width="1.5"/>
+  
+  <!-- Display panel -->
+  <rect x="155" y="65" width="90" height="45" rx="2" fill="#0a0a0a" stroke="#f5f3ef" stroke-opacity="0.15" stroke-width="0.5"/>
+  
+  <!-- Display content -->
+  <text x="200" y="82" text-anchor="middle" font-family="monospace" font-size="8" fill="#e8302a" opacity="0.7">BALANCE</text>
+  <text x="200" y="100" text-anchor="middle" font-family="monospace" font-size="14" fill="#f5f3ef" opacity="0.6">0.00</text>
+  <text x="218" y="100" text-anchor="start" font-family="monospace" font-size="6" fill="#f5f3ef" opacity="0.3">g</text>
+  
+  <!-- Status indicators -->
+  <circle cx="165" cy="125" r="3" fill="#e8302a" opacity="0.5"/>
+  <circle cx="180" cy="125" r="3" fill="#4ade80" opacity="0.4"/>
+  <circle cx="195" cy="125" r="3" fill="#f5f3ef" opacity="0.15"/>
+  
+  <!-- Spindle/shaft -->
+  <rect x="185" y="135" width="30" height="60" rx="2" fill="#1a1a1a" stroke="#f5f3ef" stroke-opacity="0.1" stroke-width="0.5"/>
+  <circle cx="200" cy="165" r="15" fill="none" stroke="#e8302a" stroke-opacity="0.2" stroke-width="1"/>
+  <circle cx="200" cy="165" r="8" fill="#0a0a0a" stroke="#f5f3ef" stroke-opacity="0.15" stroke-width="0.5"/>
+  
+  <!-- Wheel outline -->
+  <circle cx="200" cy="165" r="40" fill="none" stroke="#f5f3ef" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 4"/>
+  <circle cx="200" cy="165" r="35" fill="none" stroke="#f5f3ef" stroke-opacity="0.05" stroke-width="0.5"/>
+  
+  <!-- Weight indicators -->
+  <rect x="160" y="195" width="8" height="12" fill="#e8302a" opacity="0.3"/>
+  <rect x="232" y="195" width="8" height="12" fill="#e8302a" opacity="0.3"/>
+  
+  <!-- Control panel -->
+  <rect x="155" y="220" width="90" height="25" rx="2" fill="#0a0a0a" stroke="#f5f3ef" stroke-opacity="0.1" stroke-width="0.5"/>
+  <rect x="165" y="228" width="20" height="8" rx="1" fill="#131313" stroke="#f5f3ef" stroke-opacity="0.15" stroke-width="0.5"/>
+  <rect x="195" y="228" width="20" height="8" rx="1" fill="#131313" stroke="#e8302a" stroke-opacity="0.3" stroke-width="0.5"/>
+  <rect x="225" y="228" width="12" height="8" rx="1" fill="#131313" stroke="#f5f3ef" stroke-opacity="0.15" stroke-width="0.5"/>
+  
+  <!-- Corner accents -->
+  <path d="M0 20 L0 0 L20 0" stroke="#e8302a" stroke-opacity="0.4" stroke-width="2" fill="none"/>
+  <path d="M380 300 L400 300 L400 280" stroke="#e8302a" stroke-opacity="0.4" stroke-width="2" fill="none"/>
+  
+  <!-- Label -->
+  <text x="200" y="270" text-anchor="middle" font-family="monospace" font-size="10" fill="#f5f3ef" opacity="0.3" letter-spacing="0.15em">WHEEL BALANCER</text>
+  
+  <!-- Scanline overlay -->
+  <line x1="0" y1="0" x2="400" y2="0" stroke="#f5f3ef" stroke-opacity="0.02" stroke-width="1"/>
+  <line x1="0" y1="2" x2="400" y2="2" stroke="#f5f3ef" stroke-opacity="0.02" stroke-width="1"/>
+  <line x1="0" y1="4" x2="400" y2="4" stroke="#f5f3ef" stroke-opacity="0.02" stroke-width="1"/>
+</svg>
