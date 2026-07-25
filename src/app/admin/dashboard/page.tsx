@@ -367,6 +367,7 @@ const categories = [...new Set([...defaultCategories, ...items.map((i) => i.cate
                     ref={fileInputRef}
                     type="file"
                     accept="image/webp,image/jpeg,image/png"
+                    capture="environment"
                     onChange={handleImageSelect}
                     className="w-full border border-line bg-void px-4 py-3 text-[13px] text-bone file:mr-4 file:border-0 file:bg-ghost-red file:px-3 file:py-1 file:text-[10px] file:uppercase file:text-void"
                   />
