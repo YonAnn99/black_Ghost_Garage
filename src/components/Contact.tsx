@@ -174,12 +174,12 @@ export default function Contact() {
                 </Field>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <Field label="Vehículo (marca/modelo)" htmlFor="vehiculo" error={touched.vehiculo ? errors.vehiculo : undefined}>
+                  <Field label="Vehículo (marca/modelo/motor)" htmlFor="vehiculo" error={touched.vehiculo ? errors.vehiculo : undefined}>
                     <input
                       id="vehiculo"
                       name="vehiculo"
                       type="text"
-                      placeholder="Ej. Ford Mustang"
+                      placeholder="Ej. Ford Mustang GT 5.0 V8"
                       value={values.vehiculo}
                       onChange={(e) => handleChange("vehiculo", e.target.value)}
                       onBlur={() => handleBlur("vehiculo")}

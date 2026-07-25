@@ -1,0 +1,403 @@
+"use client";
+
+import { useState, useEffect, useCallback, useRef } from "react";
+import { workshopStats, equipmentItems, type EquipmentItem } from "@/lib/data";
+
+const equipmentIcons: Record<string, string> = {
+  "Laboratorio de inyectores":
+    "M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714a2.25 2.25 0 0 0 .659 1.591L19 14.5m-4.25-5.682c.25.023.5.05.75.082M12 21a8.966 8.966 0 0 0 5.982-2.275M12 21a8.966 8.966 0 0 1-5.982-2.275M15.75 3.104c.25.023.5.05.75.082M12 3.104c-.25.023-.5.05-.75.082m0 0a24.3 24.3 0 0 1 4.5 0m0 0v5.714a2.25 2.25 0 0 0 .659 1.591L19 14.5m-1.5-5.682",
+  Spotter:
+    "M7.5 3.75H6A2.25 2.25 0 0 0 3.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0 1 20.25 6v1.5m0 9V18A2.25 2.25 0 0 1 18 20.25h-1.5M7.5 20.25H6A2.25 2.25 0 0 1 3.75 18v-1.5M12 8.25v7.5m-3.75-3.75h7.5",
+  "Rampa de dos postes":
+    "M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21",
+  "Escáner de alta gamma":
+    "M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714a2.25 2.25 0 0 0 .659 1.591L19 14.5m-4.25-5.682c.25.023.5.05.75.082M12 21a8.966 8.966 0 0 0 5.982-2.275M12 21a8.966 8.966 0 0 1-5.982-2.275M15.75 3.104c.25.023.5.05.75.082M12 3.104c-.25.023-.5.05-.75.082m0 0a24.3 24.3 0 0 1 4.5 0m0 0v5.714a2.25 2.25 0 0 0 .659 1.591L19 14.5m-1.5-5.682",
+  "Cargador de batería inteligente":
+    "M21 10.5h.375c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125H21M3.75 18h15A2.25 2.25 0 0 0 21 15.75v-6a2.25 2.25 0 0 0-2.25-2.25h-15A2.25 2.25 0 0 0 1.5 9.75v6A2.25 2.25 0 0 0 3.75 18Zm4.5-6.75V7.5a.75.75 0 0 1 1.5 0v3.75a.75.75 0 0 1-1.5 0Zm3 0V7.5a.75.75 0 0 1 1.5 0v3.75a.75.75 0 0 1-1.5 0Zm3 0V7.5a.75.75 0 0 1 1.5 0v3.75a.75.75 0 0 1-1.5 0ZM3.75 12h15a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75v-3a.75.75 0 0 1 .75-.75Z",
+  Balanceadora:
+    "M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5",
+};
+
+const LIGHTBOX_WIDTH = 300;
+const LIGHTBOX_OFFSET = 24;
+
+function calculateCursorPosition(mouseX: number, mouseY: number): { left: number; top: number } {
+  const padding = 16;
+  let left = mouseX + LIGHTBOX_OFFSET;
+  let top = mouseY - LIGHTBOX_OFFSET;
+
+  // Evitar que se salga por la derecha
+  if (left + LIGHTBOX_WIDTH + padding > window.innerWidth) {
+    left = mouseX - LIGHTBOX_WIDTH - LIGHTBOX_OFFSET;
+  }
+
+  // Evitar que se salga por abajo
+  if (top + 320 > window.innerHeight) {
+    top = window.innerHeight - 320 - padding;
+  }
+
+  // Evitar que se salga por arriba
+  if (top < padding) {
+    top = padding;
+  }
+
+  return { left, top };
+}
+
+export default function Equipment() {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    setIsTouchDevice(window.matchMedia("(hover: none)").matches);
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  const handleHoverStart = useCallback((id: string) => {
+    if (isTouchDevice) return;
+    setHoveredId(id);
+  }, [isTouchDevice]);
+
+  const handleHoverEnd = useCallback(() => {
+    setHoveredId(null);
+  }, []);
+
+  const hoveredItem = hoveredId
+    ? equipmentItems.find((item) => item.id === hoveredId && item.image)
+    : null;
+
+  return (
+    <section
+      ref={sectionRef}
+      id="equipo"
+      className="relative bg-panel py-24 md:py-32"
+      aria-labelledby="equipment-heading"
+      onMouseMove={handleMouseMove}
+    >
+      <div className="absolute inset-0 bg-scanlines opacity-[0.03]" aria-hidden="true" />
+
+      <div className="relative mx-auto max-w-7xl px-6 md:px-8">
+        {/* Header */}
+        <div className="reveal mb-14 flex flex-col gap-4 border-b border-line pb-8 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="text-data-wide text-[10px] uppercase text-ghost-red tracking-[0.15em]">
+              ◆ Infraestructura
+            </span>
+            <h2
+              id="equipment-heading"
+              className="text-display mt-4 text-[clamp(2.2rem,5.5vw,3.5rem)] leading-[0.9] text-bone"
+            >
+              Nuestro equipo
+            </h2>
+          </div>
+          <p className="max-w-sm text-sm leading-relaxed text-bone-dim">
+            {workshopStats.synopsis}
+          </p>
+        </div>
+
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4 md:auto-rows-[minmax(140px,auto)]">
+          {/* Row 1: Stats */}
+          <StatCard
+            value={workshopStats.area}
+            unit="m²"
+            label={workshopStats.areaLabel}
+            span="md:col-span-2"
+            delay={0}
+          />
+          <StatCard
+            value={workshopStats.carBays.toString()}
+            unit=""
+            label={workshopStats.carBaysLabel}
+            span="md:col-span-1"
+            delay={80}
+          />
+          <StatCard
+            value={workshopStats.motorcycleBays.toString()}
+            unit=""
+            label={workshopStats.motorcycleBaysLabel}
+            span="md:col-span-1"
+            delay={160}
+          />
+
+          {/* Row 2: Equipment large + small */}
+          <EquipmentCard
+            item={equipmentItems[0]}
+            span="md:col-span-2 md:row-span-1"
+            delay={200}
+            onHoverStart={handleHoverStart}
+            onHoverEnd={handleHoverEnd}
+          />
+          <EquipmentCard
+            item={equipmentItems[1]}
+            span="md:col-span-1 md:row-span-1"
+            delay={260}
+            onHoverStart={handleHoverStart}
+            onHoverEnd={handleHoverEnd}
+          />
+          <EquipmentCard
+            item={equipmentItems[2]}
+            span="md:col-span-1 md:row-span-1"
+            delay={300}
+            onHoverStart={handleHoverStart}
+            onHoverEnd={handleHoverEnd}
+          />
+
+          {/* Row 3: Equipment medium */}
+          <EquipmentCard
+            item={equipmentItems[3]}
+            span="md:col-span-1 md:row-span-1"
+            delay={340}
+            onHoverStart={handleHoverStart}
+            onHoverEnd={handleHoverEnd}
+          />
+          <EquipmentCard
+            item={equipmentItems[4]}
+            span="md:col-span-1 md:row-span-1"
+            delay={400}
+            onHoverStart={handleHoverStart}
+            onHoverEnd={handleHoverEnd}
+          />
+          <EquipmentCard
+            item={equipmentItems[5]}
+            span="md:col-span-2 md:row-span-1"
+            delay={450}
+            onHoverStart={handleHoverStart}
+            onHoverEnd={handleHoverEnd}
+          />
+        </div>
+      </div>
+
+      {/* Lightbox Preview - Cursor Following */}
+      {hoveredItem && (
+        <LightboxPreview item={hoveredItem} mousePos={mousePos} />
+      )}
+    </section>
+  );
+}
+
+function StatCard({
+  value,
+  unit,
+  label,
+  span,
+  delay,
+}: {
+  value: string;
+  unit: string;
+  label: string;
+  span: string;
+  delay: number;
+}) {
+  return (
+    <div
+      className={`reveal group relative flex flex-col justify-between border border-line bg-void p-6 transition-all duration-300 hover:border-ghost-red/50 ${span}`}
+      data-reveal-delay={delay}
+    >
+      {/* Corner marks */}
+      <div className="absolute left-0 top-0 size-2 border-l border-t border-ghost-red/20 transition-colors duration-300 group-hover:border-ghost-red/50" aria-hidden="true" />
+      <div className="absolute bottom-0 right-0 size-2 border-r border-b border-ghost-red/20 transition-colors duration-300 group-hover:border-ghost-red/50" aria-hidden="true" />
+
+      <div className="flex items-baseline gap-1">
+        <span className="text-display text-[clamp(2.5rem,5vw,4rem)] leading-none text-ghost-red">
+          {value}
+        </span>
+        {unit && (
+          <span className="text-data text-sm uppercase text-ghost-red/60">
+            {unit}
+          </span>
+        )}
+      </div>
+
+      <p className="text-data-wide mt-4 text-[10px] uppercase tracking-[0.12em] text-bone-faint">
+        {label}
+      </p>
+
+      {/* Bottom line animation */}
+      <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-ghost-red transition-all duration-700 ease-[var(--ease-out-expo)] group-hover:w-full" aria-hidden="true" />
+    </div>
+  );
+}
+
+function EquipmentCard({
+  item,
+  span,
+  delay,
+  onHoverStart,
+  onHoverEnd,
+}: {
+  item: EquipmentItem;
+  span: string;
+  delay: number;
+  onHoverStart: (id: string) => void;
+  onHoverEnd: () => void;
+}) {
+  const iconPath = equipmentIcons[item.name];
+
+  return (
+    <article
+      className={`reveal group relative flex flex-col border border-line bg-void p-5 transition-all duration-300 hover:border-bone-faint ${span}`}
+      data-reveal-delay={delay}
+      aria-label={item.name}
+      onMouseEnter={() => onHoverStart(item.id)}
+      onMouseLeave={onHoverEnd}
+    >
+      {/* Double-bezel inner border */}
+      <div
+        className="pointer-events-none absolute inset-[3px] border border-line-soft opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        aria-hidden="true"
+      />
+
+      {/* Header: Icon + Category */}
+      <div className="mb-3 flex items-center justify-between">
+        {iconPath && (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="size-6 shrink-0 text-ghost-red transition-transform duration-300 group-hover:scale-110"
+            aria-hidden="true"
+          >
+            <path d={iconPath} />
+          </svg>
+        )}
+        <span className="text-data-wide text-[9px] uppercase tracking-[0.1em] text-bone-faint">
+          {item.category}
+        </span>
+      </div>
+
+      {/* Title */}
+      <h3 className="text-display text-lg leading-tight text-bone">
+        {item.name}
+      </h3>
+
+      {/* Description */}
+      <p className="mt-2 flex-1 text-[13px] leading-relaxed text-bone-dim">
+        {item.description}
+      </p>
+
+      {/* Bottom line animation */}
+      <div className="mt-4 h-[2px] w-0 bg-ghost-red transition-all duration-700 ease-[var(--ease-out-expo)] group-hover:w-full" aria-hidden="true" />
+
+      {/* Corner marks */}
+      <div className="absolute left-0 top-0 size-2 border-l border-t border-ghost-red/20 transition-colors duration-300 group-hover:border-ghost-red/50" aria-hidden="true" />
+      <div className="absolute bottom-0 right-0 size-2 border-r border-b border-ghost-red/20 transition-colors duration-300 group-hover:border-ghost-red/50" aria-hidden="true" />
+    </article>
+  );
+}
+
+function LightboxPreview({
+  item,
+  mousePos,
+}: {
+  item: EquipmentItem;
+  mousePos: { x: number; y: number };
+}) {
+  const [position, setPosition] = useState({ left: 0, top: 0 });
+  const [isVisible, setIsVisible] = useState(false);
+  const [displayItem, setDisplayItem] = useState<EquipmentItem>(item);
+  const [prevItem, setPrevItem] = useState<EquipmentItem | null>(null);
+  const isInitialMount = useRef(true);
+
+  // Actualizar posición basada en cursor
+  useEffect(() => {
+    const pos = calculateCursorPosition(mousePos.x, mousePos.y);
+    setPosition(pos);
+  }, [mousePos]);
+
+  // Manejar cambio de imagen con crossfade
+  useEffect(() => {
+    if (isInitialMount.current) {
+      setDisplayItem(item);
+      isInitialMount.current = false;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsVisible(true));
+      });
+      return;
+    }
+
+    if (item.id !== displayItem.id) {
+      setPrevItem(displayItem);
+      setDisplayItem(item);
+
+      const timer = setTimeout(() => setPrevItem(null), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [item, displayItem.id]);
+
+  if (!displayItem.image) return null;
+
+  return (
+    <div
+      className={`fixed z-50 pointer-events-none transition-opacity duration-300 ease-[var(--ease-out-expo)] ${
+        isVisible ? "opacity-100" : "opacity-0"
+      }`}
+      style={{
+        left: position.left,
+        top: position.top,
+        width: LIGHTBOX_WIDTH,
+      }}
+    >
+      <div className="overflow-hidden border border-ghost-red/30 bg-void shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+        {/* Image container with crossfade */}
+        <div className="relative aspect-[4/3] w-full">
+          {/* Previous image (fading out) */}
+          {prevItem?.image && (
+            <img
+              src={prevItem.image}
+              alt={prevItem.name}
+              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300"
+              style={{ opacity: 0 }}
+            />
+          )}
+
+          {/* Current image (fading in) */}
+          <img
+            src={displayItem.image}
+            alt={displayItem.name}
+            className={`h-full w-full object-cover transition-opacity duration-300 ${
+              isVisible ? "opacity-100" : "opacity-0"
+            }`}
+          />
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-void/60 via-transparent to-transparent" />
+
+          {/* Scanline effect */}
+          <div className="absolute inset-0 bg-scanlines opacity-[0.05]" />
+        </div>
+
+        {/* Content */}
+        <div className="relative p-4">
+          {/* Category badge */}
+          <div className="mb-2 flex items-center gap-2">
+            <span className="size-1.5 rounded-full bg-ghost-red animate-pulse-dot" />
+            <span className="text-data-wide text-[9px] uppercase tracking-[0.12em] text-ghost-red">
+              {displayItem.category}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h4 className="text-display text-base leading-tight text-bone">
+            {displayItem.name}
+          </h4>
+
+          {/* Decorative line */}
+          <div className="mt-3 h-[1px] w-full bg-gradient-to-r from-ghost-red/50 via-ghost-red/20 to-transparent" />
+        </div>
+
+        {/* Corner accents */}
+        <div className="absolute left-0 top-0 size-3 border-l-2 border-t-2 border-ghost-red/40" />
+        <div className="absolute bottom-0 right-0 size-3 border-r-2 border-b-2 border-ghost-red/40" />
+      </div>
+    </div>
+  );
+}

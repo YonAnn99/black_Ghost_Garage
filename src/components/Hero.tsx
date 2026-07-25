@@ -54,19 +54,18 @@ export default function Hero() {
           className="reveal text-display text-[clamp(2.8rem,9vw,6rem)] leading-[1.35] text-bone"
           data-reveal-delay="100"
         >
-          Mecánica de
+          Taller de
           <br />
-          <span className="text-ghost-red">perfección pura</span>
+          <span className="text-ghost-red">Excelencia para</span>
           <br />
-          Para máquinas exigentes.
+          Máquinas exigentes.
         </h1>
 
         <p
           className="reveal mt-8 max-w-xl text-[15px] leading-relaxed text-bone-dim md:text-base"
           data-reveal-delay="200"
         >
-          Precisión mecánica, estética agresiva y rendimiento sin
-          compromisos. Entra al lado oscuro de la automotriz.
+          Perfección mecánica, estética agresiva y precisión electrica.
         </p>
 
         {/* CTAs — magnetic buttons */}
