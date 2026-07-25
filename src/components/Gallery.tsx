@@ -1,17 +1,49 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { galleryItems } from "@/lib/data";
+import { galleryItems as fallbackItems } from "@/lib/data";
+import Image from "next/image";
 
-const categories = ["Todos", ...new Set(galleryItems.map((g) => g.category))];
+type PortfolioItem = {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  image: string;
+  tags: string[];
+  featured?: boolean;
+};
 
 export default function Gallery() {
   const [active, setActive] = useState("Todos");
+  const [items, setItems] = useState<PortfolioItem[]>(fallbackItems);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPortfolio = async () => {
+      try {
+        const res = await fetch("/api/portfolio");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        if (data.length > 0) {
+          setItems(data);
+        }
+      } catch {
+        console.warn("Using fallback portfolio data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPortfolio();
+  }, []);
+
+  const categories = ["Todos", ...new Set(items.map((g) => g.category))];
 
   const filtered =
     active === "Todos"
-      ? galleryItems
-      : galleryItems.filter((g) => g.category === active);
+      ? items
+      : items.filter((g) => g.category === active);
 
   return (
     <section
@@ -71,9 +103,23 @@ export default function Gallery() {
           role="tabpanel"
           key={active}
         >
-          {filtered.map((item, idx) => (
-            <GalleryCard key={item.id} item={item} index={idx} />
-          ))}
+          {loading
+            ? Array.from({ length: 6 }).map((_, idx) => (
+                <div
+                  key={`skeleton-${idx}`}
+                  className="border border-line bg-void animate-pulse"
+                >
+                  <div className="aspect-[16/10] bg-panel" />
+                  <div className="p-5 space-y-3">
+                    <div className="h-3 w-16 bg-panel-raised" />
+                    <div className="h-5 w-3/4 bg-panel-raised" />
+                    <div className="h-3 w-full bg-panel-raised" />
+                  </div>
+                </div>
+              ))
+            : filtered.map((item, idx) => (
+                <GalleryCard key={item.id} item={item} index={idx} />
+              ))}
         </div>
 
         {/* Counter */}
@@ -82,7 +128,7 @@ export default function Gallery() {
           data-reveal-delay="200"
         >
           <span className="text-data-wide">
-            Mostrando {filtered.length} de {galleryItems.length} operaciones
+            Mostrando {filtered.length} de {items.length} operaciones
           </span>
           <span className="text-data-wide hidden sm:inline">///</span>
           <span className="text-data-wide">
@@ -98,11 +144,12 @@ function GalleryCard({
   item,
   index,
 }: {
-  item: (typeof galleryItems)[number];
+  item: PortfolioItem;
   index: number;
 }) {
   const cardRef = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     const el = cardRef.current;
@@ -118,6 +165,8 @@ function GalleryCard({
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  const hasRealImage = item.image && !item.image.includes("placeholder") && !imgError;
 
   return (
     <article
@@ -136,46 +185,56 @@ function GalleryCard({
         aria-hidden="true"
       />
 
-      {/* Image placeholder */}
+      {/* Image area */}
       <div className="relative aspect-[16/10] overflow-hidden bg-panel">
-        {/* SVG placeholder with noir grid */}
-        <svg
-          className="absolute inset-0 h-full w-full"
-          viewBox="0 0 400 250"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <defs>
-            <pattern id={`grid-${item.id}`} width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M0 0H20V20" fill="none" stroke="#e8302a" strokeOpacity="0.12" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="400" height="250" fill="#131313" />
-          <rect width="400" height="250" fill={`url(#grid-${item.id})`} />
-          <text
-            x="200"
-            y="120"
-            textAnchor="middle"
-            fill="#e8302a"
-            fillOpacity="0.25"
-            fontSize="11"
-            fontFamily="JetBrains Mono, monospace"
-            letterSpacing="0.1em"
+        {hasRealImage ? (
+          <Image
+            src={item.image}
+            alt={item.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <svg
+            className="absolute inset-0 h-full w-full"
+            viewBox="0 0 400 250"
+            preserveAspectRatio="none"
+            aria-hidden="true"
           >
-            [ IMAGEN Pendiente ]
-          </text>
-          <text
-            x="200"
-            y="140"
-            textAnchor="middle"
-            fill="#6e6c68"
-            fontSize="9"
-            fontFamily="JetBrains Mono, monospace"
-            letterSpacing="0.08em"
-          >
-            {item.id.toUpperCase()}
-          </text>
-        </svg>
+            <defs>
+              <pattern id={`grid-${item.id}`} width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M0 0H20V20" fill="none" stroke="#e8302a" strokeOpacity="0.12" strokeWidth="0.5" />
+              </pattern>
+            </defs>
+            <rect width="400" height="250" fill="#131313" />
+            <rect width="400" height="250" fill={`url(#grid-${item.id})`} />
+            <text
+              x="200"
+              y="120"
+              textAnchor="middle"
+              fill="#e8302a"
+              fillOpacity="0.25"
+              fontSize="11"
+              fontFamily="JetBrains Mono, monospace"
+              letterSpacing="0.1em"
+            >
+              [ IMAGEN Pendiente ]
+            </text>
+            <text
+              x="200"
+              y="140"
+              textAnchor="middle"
+              fill="#6e6c68"
+              fontSize="9"
+              fontFamily="JetBrains Mono, monospace"
+              letterSpacing="0.08em"
+            >
+              {item.id.toUpperCase()}
+            </text>
+          </svg>
+        )}
 
         {/* Overlay on hover */}
         <div className="absolute inset-0 flex items-center justify-center bg-void/0 opacity-0 transition-all duration-300 group-hover:bg-void/60 group-hover:opacity-100">
