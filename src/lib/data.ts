@@ -203,8 +203,8 @@ export const contactInfo = {
   cityLine: "55925 Oxtotipac, Méx.",
   accessNote: "Acceso solo con cita previa.",
   mapsUrl: "https://maps.google.com/maps?q=Black+Ghost's+Garage+Nezahualcóyotl+Oxtotipac+México",
-  whatsappUrl: "https://wa.me/525635363577",
-  whatsappNumber: "+52 56 3536 3577",
+  whatsappUrl: "https://wa.me/525555555555",
+  whatsappNumber: "+52 56 35555555",
   email: "contacto@blackghostsgarage.mx",
   hours: [
     { day: "Lunes — Viernes", time: "09:00 — 19:00" },

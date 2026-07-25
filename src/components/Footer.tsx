@@ -1,7 +1,11 @@
 import Image from "next/image";
 import { socialLinks } from "@/lib/data";
 
-const legalLinks = ["Privacidad", "Términos", "Soporte técnico"];
+const legalLinks = [
+  { label: "Privacidad", href: "/aviso-de-privacidad" },
+  { label: "Términos", href: "#" },
+  { label: "Soporte técnico", href: "#" },
+];
 
 export default function Footer() {
   return (
@@ -47,11 +51,11 @@ export default function Footer() {
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
               {legalLinks.map((l) => (
                 <a
-                  key={l}
-                  href="#"
+                  key={l.label}
+                  href={l.href}
                   className="btn-press text-data-wide text-[10px] uppercase tracking-[0.1em] text-bone-dim transition-colors duration-200 hover:text-ghost-red"
                 >
-                  {l}
+                  {l.label}
                 </a>
               ))}
             </div>

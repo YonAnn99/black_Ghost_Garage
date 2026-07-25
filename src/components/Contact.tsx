@@ -7,15 +7,19 @@ import ReviewsCarousel from "./ReviewsCarousel";
 
 type FieldErrors = {
   nombre?: string;
+  telefono?: string;
   vehiculo?: string;
   descripcion?: string;
+  privacidad?: string;
 };
 
 type FormValues = {
   nombre: string;
+  telefono: string;
   vehiculo: string;
   anio: string;
   descripcion: string;
+  privacidad: boolean;
 };
 
 function validate(values: FormValues): FieldErrors {
@@ -25,6 +29,12 @@ function validate(values: FormValues): FieldErrors {
     errors.nombre = "El nombre es obligatorio.";
   } else if (values.nombre.trim().length < 2) {
     errors.nombre = "El nombre debe tener al menos 2 caracteres.";
+  }
+
+  if (!values.telefono.trim()) {
+    errors.telefono = "El teléfono es obligatorio.";
+  } else if (!/^\d{10}$/.test(values.telefono.replace(/\s/g, ""))) {
+    errors.telefono = "Ingresa un número de 10 dígitos.";
   }
 
   if (!values.vehiculo.trim()) {
@@ -39,28 +49,29 @@ function validate(values: FormValues): FieldErrors {
     errors.descripcion = "Describe el requerimiento con más detalle (mín. 10 caracteres).";
   }
 
+  if (!values.privacidad) {
+    errors.privacidad = "Debes aceptar el Aviso de Privacidad.";
+  }
+
   return errors;
 }
 
 export default function Contact() {
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [values, setValues] = useState<FormValues>({
     nombre: "",
+    telefono: "",
     vehiculo: "",
     anio: "",
     descripcion: "",
+    privacidad: false,
   });
 
   const errors = validate(values);
-  const isValid = Object.keys(errors).length === 0;
 
   const handleChange = useCallback(
-    (field: keyof FormValues, value: string) => {
+    (field: keyof FormValues, value: string | boolean) => {
       setValues((prev) => ({ ...prev, [field]: value }));
-      setServerError(null);
     },
     []
   );
@@ -69,43 +80,31 @@ export default function Contact() {
     setTouched((prev) => ({ ...prev, [field]: true }));
   }, []);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setServerError(null);
-
-    const allTouched = { nombre: true, vehiculo: true, descripcion: true };
+  function handleWhatsApp() {
+    const allTouched = {
+      nombre: true,
+      telefono: true,
+      vehiculo: true,
+      descripcion: true,
+      privacidad: true,
+    };
     setTouched(allTouched);
 
-    if (!isValid) return;
+    if (Object.keys(errors).length > 0) return;
 
-    setLoading(true);
+    const message = `Hola Black Ghost's Garage 👋
 
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nombre: values.nombre.trim(),
-          vehiculo: values.vehiculo.trim(),
-          anio: values.anio.trim() || undefined,
-          descripcion: values.descripcion.trim(),
-        }),
-      });
+Nombre: ${values.nombre.trim()}
+Teléfono: ${values.telefono.trim()}
+Vehículo: ${values.vehiculo.trim()}
+Año: ${values.anio.trim() || "No especificado"}
+Descripción: ${values.descripcion.trim()}
 
-      const data = await res.json();
+Solicito cita para diagnóstico.`;
 
-      if (!data.ok) {
-        setServerError(data.error || "Error al enviar. Intenta de nuevo.");
-        return;
-      }
-
-      setSubmitted(true);
-      trackEvent("Contact Form Submitted", { vehicle: values.vehiculo.trim() });
-    } catch {
-      setServerError("No se pudo conectar con el servidor. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
+    const url = `https://wa.me/525635363577?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+    trackEvent("WhatsApp Click", { source: "contact_form" });
   }
 
   return (
@@ -127,147 +126,147 @@ export default function Contact() {
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
           {/* Form */}
           <div className="reveal" data-reveal-delay="100">
-            {submitted ? (
-              <div className="flex h-full min-h-[420px] flex-col items-center justify-center border border-line bg-panel p-10 text-center animate-system-boot">
-                <div className="relative">
-                  <span className="absolute -inset-3 rounded-full bg-ghost-red/20 animate-pulse-dot" />
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="size-10 text-ghost-red">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                </div>
-                <p className="text-display mt-6 text-2xl text-bone">
-                  Transmisión enviada
-                </p>
-                <p className="mt-3 max-w-xs text-sm leading-relaxed text-bone-dim">
-                  Recibimos los datos de tu vehículo. Un especialista
-                  te contactará en las próximas horas hábiles.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSubmitted(false);
-                    setValues({ nombre: "", vehiculo: "", anio: "", descripcion: "" });
-                    setTouched({});
-                  }}
-                  className="text-data mt-7 border-b border-ghost-red pb-1 text-[12px] uppercase text-bone-dim hover:text-bone"
-                >
-                  Enviar otra transmisión
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
-                <Field label="Nombre / Piloto" htmlFor="nombre" error={touched.nombre ? errors.nombre : undefined}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleWhatsApp();
+              }}
+              className="flex flex-col gap-6"
+              noValidate
+            >
+              <Field label="Nombre / Piloto" htmlFor="nombre" error={touched.nombre ? errors.nombre : undefined}>
+                <input
+                  id="nombre"
+                  name="nombre"
+                  type="text"
+                  placeholder="Ingresa tu nombre"
+                  value={values.nombre}
+                  onChange={(e) => handleChange("nombre", e.target.value)}
+                  onBlur={() => handleBlur("nombre")}
+                  className={`w-full border bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:outline-none transition-colors ${
+                    touched.nombre && errors.nombre
+                      ? "border-ghost-red focus:border-ghost-red"
+                      : "border-line focus:border-ghost-red"
+                  }`}
+                />
+              </Field>
+
+              <Field label="Teléfono" htmlFor="telefono" error={touched.telefono ? errors.telefono : undefined}>
+                <input
+                  id="telefono"
+                  name="telefono"
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="Ej. 55 1234 5678"
+                  value={values.telefono}
+                  onChange={(e) => handleChange("telefono", e.target.value)}
+                  onBlur={() => handleBlur("telefono")}
+                  className={`w-full border bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:outline-none transition-colors ${
+                    touched.telefono && errors.telefono
+                      ? "border-ghost-red focus:border-ghost-red"
+                      : "border-line focus:border-ghost-red"
+                  }`}
+                />
+              </Field>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <Field label="Vehículo (marca/modelo/motor)" htmlFor="vehiculo" error={touched.vehiculo ? errors.vehiculo : undefined}>
                   <input
-                    id="nombre"
-                    name="nombre"
+                    id="vehiculo"
+                    name="vehiculo"
                     type="text"
-                    placeholder="Ingresa tu nombre"
-                    value={values.nombre}
-                    onChange={(e) => handleChange("nombre", e.target.value)}
-                    onBlur={() => handleBlur("nombre")}
+                    placeholder="Ej. Ford Mustang GT 5.0 V8"
+                    value={values.vehiculo}
+                    onChange={(e) => handleChange("vehiculo", e.target.value)}
+                    onBlur={() => handleBlur("vehiculo")}
                     className={`w-full border bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:outline-none transition-colors ${
-                      touched.nombre && errors.nombre
+                      touched.vehiculo && errors.vehiculo
                         ? "border-ghost-red focus:border-ghost-red"
                         : "border-line focus:border-ghost-red"
                     }`}
                   />
                 </Field>
-
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <Field label="Vehículo (marca/modelo/motor)" htmlFor="vehiculo" error={touched.vehiculo ? errors.vehiculo : undefined}>
-                    <input
-                      id="vehiculo"
-                      name="vehiculo"
-                      type="text"
-                      placeholder="Ej. Ford Mustang GT 5.0 V8"
-                      value={values.vehiculo}
-                      onChange={(e) => handleChange("vehiculo", e.target.value)}
-                      onBlur={() => handleBlur("vehiculo")}
-                      className={`w-full border bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:outline-none transition-colors ${
-                        touched.vehiculo && errors.vehiculo
-                          ? "border-ghost-red focus:border-ghost-red"
-                          : "border-line focus:border-ghost-red"
-                      }`}
-                    />
-                  </Field>
-                  <Field label="Año" htmlFor="anio">
-                    <input
-                      id="anio"
-                      name="anio"
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="Ej. 2023"
-                      value={values.anio}
-                      onChange={(e) => handleChange("anio", e.target.value)}
-                      className="w-full border border-line bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:border-ghost-red focus:outline-none"
-                    />
-                  </Field>
-                </div>
-
-                <Field label="Descripción del requerimiento" htmlFor="descripcion" error={touched.descripcion ? errors.descripcion : undefined}>
-                  <textarea
-                    id="descripcion"
-                    name="descripcion"
-                    rows={4}
-                    placeholder="Describe el servicio, falla o modificación requerida…"
-                    value={values.descripcion}
-                    onChange={(e) => handleChange("descripcion", e.target.value)}
-                    onBlur={() => handleBlur("descripcion")}
-                    className={`w-full resize-none border bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:outline-none transition-colors ${
-                      touched.descripcion && errors.descripcion
-                        ? "border-ghost-red focus:border-ghost-red"
-                        : "border-line focus:border-ghost-red"
-                    }`}
+                <Field label="Año" htmlFor="anio">
+                  <input
+                    id="anio"
+                    name="anio"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Ej. 2023"
+                    value={values.anio}
+                    onChange={(e) => handleChange("anio", e.target.value)}
+                    className="w-full border border-line bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:border-ghost-red focus:outline-none"
                   />
                 </Field>
+              </div>
 
-                {serverError && (
-                  <div className="flex items-center gap-2 rounded border border-ghost-red/30 bg-ghost-red/10 px-4 py-3 text-[13px] text-ghost-red">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="size-4 shrink-0">
+              <Field label="Descripción del requerimiento" htmlFor="descripcion" error={touched.descripcion ? errors.descripcion : undefined}>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  rows={4}
+                  placeholder="Describe el servicio, falla o modificación requerida…"
+                  value={values.descripcion}
+                  onChange={(e) => handleChange("descripcion", e.target.value)}
+                  onBlur={() => handleBlur("descripcion")}
+                  className={`w-full resize-none border bg-panel px-4 py-3 text-sm text-bone placeholder:text-bone-faint focus:outline-none transition-colors ${
+                    touched.descripcion && errors.descripcion
+                      ? "border-ghost-red focus:border-ghost-red"
+                      : "border-line focus:border-ghost-red"
+                  }`}
+                />
+              </Field>
+
+              {/* Privacy checkbox */}
+              <div className="flex flex-col gap-2">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={values.privacidad}
+                    onChange={(e) => handleChange("privacidad", e.target.checked)}
+                    onBlur={() => handleBlur("privacidad")}
+                    className="mt-1 size-4 shrink-0 border border-line bg-panel accent-ghost-red"
+                  />
+                  <span className="text-[13px] leading-relaxed text-bone-dim">
+                    He leído y acepto el{" "}
+                    <a
+                      href="/aviso-de-privacidad"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-ghost-red underline underline-offset-2 hover:text-bone"
+                    >
+                      Aviso de Privacidad
+                    </a>
+                  </span>
+                </label>
+                {touched.privacidad && errors.privacidad && (
+                  <p className="flex items-center gap-1.5 text-[12px] text-ghost-red">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="size-3 shrink-0">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
                     </svg>
-                    {serverError}
-                  </div>
+                    {errors.privacidad}
+                  </p>
                 )}
+              </div>
 
-                <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="text-data inline-flex items-center justify-center gap-2 bg-ghost-red px-7 py-3.5 text-[13px] uppercase text-void transition-colors hover:bg-bone disabled:opacity-50 disabled:cursor-not-allowed"
+              {/* WhatsApp button */}
+              <div className="mt-2">
+                <button
+                  type="submit"
+                  className="text-data inline-flex w-full items-center justify-center gap-2 bg-[#25D366] px-7 py-3.5 text-[13px] uppercase text-void transition-colors hover:bg-[#20ba5a] sm:w-auto"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="size-4"
+                    aria-hidden="true"
                   >
-                    {loading ? (
-                      <>
-                        <svg className="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                        Transmitiendo...
-                      </>
-                    ) : (
-                      "Enviar transmisión"
-                    )}
-                  </button>
-                  <a
-                    href={contactInfo.whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackEvent("WhatsApp Click", { source: "contact_form" })}
-                    className="text-data inline-flex items-center justify-center gap-2 border border-line px-7 py-3.5 text-[13px] uppercase text-bone-dim transition-colors hover:border-bone hover:text-bone"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="size-4"
-                      aria-hidden="true"
-                    >
-                      <path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-1.4-.6-2.4-1.4-3.2-2.8-.1-.2-.1-.4.1-.5.2-.2.5-.5.6-.7.1-.2 0-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.3 1 2.6 1.1 2.8.1.2 1.7 2.7 4.2 3.7 2 .8 2.4.6 2.8.6.4 0 1.3-.5 1.5-1 .2-.5.2-.9.1-1Zm-5.5 7.1c-1.6 0-3.2-.4-4.5-1.2l-.3-.2-3.4.9.9-3.3-.2-.3a8.9 8.9 0 0 1 13.6-11 8.9 8.9 0 0 1-6.1 15.1Z" />
-                    </svg>
-                    WhatsApp
-                  </a>
-                </div>
-              </form>
-            )}
+                    <path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-1.4-.6-2.4-1.4-3.2-2.8-.1-.2-.1-.4.1-.5.2-.2.5-.5.6-.7.1-.2 0-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.3 1 2.6 1.1 2.8.1.2 1.7 2.7 4.2 3.7 2 .8 2.4.6 2.8.6.4 0 1.3-.5 1.5-1 .2-.5.2-.9.1-1Zm-5.5 7.1c-1.6 0-3.2-.4-4.5-1.2l-.3-.2-3.4.9.9-3.3-.2-.3a8.9 8.9 0 0 1 13.6-11 8.9 8.9 0 0 1-6.1 15.1Z" />
+                  </svg>
+                  Enviar por WhatsApp
+                </button>
+              </div>
+            </form>
           </div>
 
           {/* Coordinates / location */}
