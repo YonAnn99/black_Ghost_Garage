@@ -167,7 +167,7 @@ export default function Header() {
             <a
               href="/admin"
               onClick={() => setMobileOpen(false)}
-              className={`mt-3 flex items-center justify-center gap-2 border border-line-soft px-5 py-3 text-[11px] uppercase text-bone-faint tracking-[0.1em] transition-all duration-300 hover:border-ghost-red/50 hover:text-ghost-red ${
+              className={`mt-3 flex items-center justify-center gap-2 border border-line-soft px-5 py-3 text-[11px] uppercase text-bone-dim tracking-[0.1em] transition-all duration-300 hover:border-ghost-red/50 hover:text-ghost-red ${
                 mobileOpen
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-4"
