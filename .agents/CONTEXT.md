@@ -8,7 +8,7 @@
 
 **Black Ghost's Garage** es una landing page single-page para un taller mecánico especializado en Ciudad de México. Estética **noir industrial brutalista**: fondo negro absoluto (`#0a0a0a`), acento rojo fantasma (`#e8302a`), texto hueso (`#f5f3ef`). El sitio transmite una atmósfera de **panel de diagnóstico militar** con scanlines CRT, grid sutil, esquinas HUD y animaciones de reveal al scroll con blur de entrada.
 
-**Secciones activas:** Header (fijo, blur, hamburger magnético + stagger reveal), Hero (fullscreen con double-bezel emblem + CTAs magnéticos + HUD telemetry), Services (3 tarjetas de diagnóstico con double-bezel + crosshairs), Gallery (portafolio de trabajos con filtros + cards industrial), About (panel de stats brutalista + industrial markers), Contact (formulario double-bezel + mapa real Google Maps + horarios + **carrusel de reseñas Google Maps**), Footer (tipografía industrial + telemetry strip).
+**Secciones activas:** Header (fijo, blur, hamburger magnético + stagger reveal), Hero (fullscreen con double-bezel emblem + CTAs magnéticos + HUD telemetry), Services (3 tarjetas de diagnóstico con double-bezel + crosshairs), **Equipment** (bento grid brutalista con card flip mobile + lightbox desktop), Gallery (portafolio de trabajos con filtros + cards industrial), About (panel de stats brutalista + industrial markers), Contact (formulario double-bezel + mapa real Google Maps + horarios + **carrusel de reseñas Google Maps**), Footer (tipografía industrial + telemetry strip).
 
 **Estado:** Todos los componentes refactorizados con diseño industrial-brutalist consistente. El sitio tiene cohesión visual completa.
 
@@ -35,23 +35,30 @@
 | 2026-06-30 | **Mapa restaurado** | Mapa SVG placeholder funcional (iframe de Google Maps bloqueado). Click abre Google Maps directamente. |
 | 2026-06-30 | **Formulario mejorado** | Validación en tiempo real (blur + change), mensajes de error descriptivos por campo, animación success con checkmark, loading spinner, banner de error del servidor, reset completo al enviar otra transmisión. |
 | 2026-06-30 | **Analytics Plausible** | Integrado Plausible Analytics (privacy-friendly). Eventos custom: `Contact Form Submitted` (con vehículo), `WhatsApp Click` (con source). Utility reutilizable en `lib/analytics.ts`. |
+| 2026-07-17 | **Migración Linux→macOS** | Proyecto trasladado a `/Users/cesaranaya/Documents/BGG/black_Ghost_Garage`. Eliminado `lightningcss-linux-x64-gnu` de devDeps. Regenerado `package-lock.json` para macOS. |
+| 2026-07-17 | **CSP dev mode** | Agregado `unsafe-eval` a CSP en `next.config.ts` para habilitar HMR en modo desarrollo. |
+| 2026-07-17 | **Servicios renombrados** | Grupos cambiados: `mecanica` (antes `motocicletas`), `electrico` (antes `carros`). Categoría de galería cambiada de "Mecánica" a "Carro". |
+| 2026-07-17 | **Sección Equipment (NUEVA)** | Nuevo componente `Equipment.tsx` — bento grid 4 columnas con 6 items de equipo. Tarjetas con doble-bezel, crosshair corners. Desktop: lightbox preview que sigue al cursor. Mobile: card flip 3D con tap para voltear + IntersectionObserver para auto-reset al scroll. |
+| 2026-07-17 | **Imágenes equipo WebP** | Convertidas 8 imágenes JPG a WebP con sharp. Almacenadas en `public/images/equipment/`. |
+| 2026-07-17 | **Fix layout Equipment** | Corregido colapso de height en mobile (`.card-flip-container` ahora tiene `min-height: 280px`). Agregado `overflow: hidden` a `.card-flip-inner`, `.card-flip-front`, `.card-flip-back` para prevenir desbordamiento de texto. Agregado `line-clamp-4` a descripciones. |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 
 | Archivo | Cambios |
 |---|---|
-| `globals.css` | Nuevas curvas: `--ease-out-expo`, `--ease-out-quart`, `--ease-spring`. Keyframes: `system-boot`, `data-stream`, `hud-line`, `glitch-clip`. Utilidades: `.crosshair`, `.btn-press`, `.glow-red`, `.hover-lift`, `.text-data-wide`. Reveal con blur de entrada. Stagger delays via data-attribute. |
+| `globals.css` | Nuevas curvas: `--ease-out-expo`, `--ease-out-quart`, `--ease-spring`. Keyframes: `system-boot`, `data-stream`, `hud-line`, `glitch-clip`, `eye-blink`. Utilidades: `.crosshair`, `.btn-press`, `.glow-red`, `.hover-lift`, `.text-data-wide`. Card flip: `.card-flip-container`, `.card-flip-inner`, `.card-flip-front`, `.card-flip-back`. Reveal con blur de entrada. Stagger delays via data-attribute. |
 | `Hero.tsx` | Double-bezel emblem (borde + padding). Tipografía masiva `clamp(2.8rem,9vw,6rem)` con `leading-[0.88]`. CTAs con `btn-press` (scale 0.97). HUD corners + telemetry strip con separators `///`. ARIA labels. `min-h-[100dvh]`. |
 | `Services.tsx` | Double-bezel inset border en hover. Crosshair corners. Unit IDs con brackets `[UNIT.0X]`. Icon scale en hover. Progress bar con `ease-[var(--ease-out-expo)]`. `<article>` semántico con `role="listitem"`. ARIA labels. |
 | `Gallery.tsx` | **NUEVO** — Componente client con useState para filtros. Grid responsive 1/2/3 columnas. Cards con double-bezel inset, crosshair corners, SVG placeholders noir, badges de categoría, tags. Filtros por categoría con `role="tablist"`. Counter de operaciones. |
+| `Equipment.tsx` | **NUEVO** — Componente client con bento grid 4 columnas. 6 items de equipo con iconos SVG. Desktop: lightbox preview que sigue al cursor con crossfade. Mobile: card flip 3D con tap, IntersectionObserver para auto-reset. Scroll-reveal con delays escalonados. |
 | `data.ts` | Tipo `GalleryItem` (id, title, category, description, image, tags). 6 proyectos de ejemplo. NavLinks actualizado con `#portafolio`. |
-| `page.tsx` | Gallery inserto entre Services y About. Import añadido. |
+| `page.tsx` | Gallery inserto entre Services y About. Equipment inserto entre Services y Gallery. Import añadido. Structured Data JSON-LD (AutoRepair). |
 | `Header.tsx` | **REFACTOR** — Logo double-bezel (borde + padding + glow). Hamburger magnético con morphing a X usando `--ease-spring`. Nav desktop con `btn-press`. Mobile menu con stagger reveal (delay escalonado 100+idx*50ms). Corner accents en botón hamburguesa. `aria-controls`, `aria-expanded`. Nav links con prefijo `[0X]`. CTA con dot animado. `backdrop-blur-xl`. |
 | `About.tsx` | **REFACTOR** — Headline con acento rojo en segunda línea. Stats panel con double-bezel inset. Unit IDs `[STAT.0X]` en cada stat. Crosshair corners. Badges industriales. Protocol link con flecha en cuadrado. `aria-labelledby` en sección. |
 | `Contact.tsx` | **REFACTOR** — Formulario con validación en tiempo real, errores descriptivos, animación success. Mapa SVG placeholder. Carrusel de reseñas integrado. Analytics events (form submit, WhatsApp click). |
 | `Footer.tsx` | **REFACTOR** — Logo con double-bezel. Copyright con `[©]`. Links legales y sociales con `btn-press`. Bottom bar con telemetry strip `[SYS.SHUTDOWN]`. `role="contentinfo"`. Background `#080302`. |
 | `api/contact/route.ts` | **NUEVO** — API POST con validación de campos requeridos. Nodemailer transporter SMTP. Email HTML con estilo industrial (fondo negro, borde rojo, tipografía monospace). ID de transmisión `BG-xxxx`. Logging con `[CONTACT]` prefix. |
-| `data.ts` | **ACTUALIZADO** — WhatsApp: `+52 56 3536 3577` en `whatsappUrl` y `whatsappNumber`. |
+| `data.ts` | **ACTUALIZADO** — WhatsApp: `+52 56 3536 3577` en `whatsappUrl` y `whatsappNumber`. Agregados `workshopStats` (area, carBays, motorcycleBays, employees). Agregados 6 `equipmentItems` con `image: string | null` para equipo del taller. |
 | `.env.local` | **NUEVO** — Variables de entorno para SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `CONTACT_EMAIL`. |
 
 **Skills instaladas (disponibles en `.agents/skills/`):**
@@ -99,6 +106,7 @@ black-ghosts-garage/
 │   │   ├── Header.tsx          # Navbar fija, blur, mobile menu (client)
 │   │   ├── Hero.tsx            # Sección fullscreen, logo, CTAs
 │   │   ├── Services.tsx        # Grid 3 tarjetas diagnóstico
+│   │   ├── Equipment.tsx       # Bento grid equipo + card flip mobile + lightbox desktop (client)
 │   │   ├── Gallery.tsx         # Portafolio de trabajos con filtros (client)
 │   │   ├── About.tsx           # Stats + copy
 │   │   ├── Contact.tsx         # Formulario validado + mapa SVG + carrusel reseñas (client)
@@ -113,8 +121,15 @@ black-ghosts-garage/
 ├── public/
 │   ├── robots.txt              # Reglas para crawlers + sitemap URL
 │   └── images/
-│   ├── ghost-logo.png
-│   └── ghost-logo.svg
+│       ├── ghost-logo.png
+│       ├── ghost-logo.svg
+│       └── equipment/          # Imágenes WebP del equipo del taller
+│           ├── scan.webp
+│           ├── alignment.webp
+│           ├── pressure-test.webp
+│           ├── battery.webp
+│           ├── oil-change.webp
+│           └── suspension.webp
 ├── package.json
 ├── tsconfig.json
 ├── postcss.config.mjs
@@ -163,7 +178,7 @@ black-ghosts-garage/
 
 ### 🔴 Prioridad Alta (Producción)
 
-- [ ] Performance de imágenes — Usar `<Image>` de Next.js en Gallery, lazy loading, formatos WebP/AVIF
+- [ ] Performance de imágenes — Usar `<Image>` de Next.js en Gallery y Equipment, lazy loading, formatos WebP/AVIF
 - [ ] Seguridad — Rate limiting en `/api/contact`, sanitizar inputs, headers de seguridad (CSP, X-Frame-Options)
 
 ### 🟡 Prioridad Media (UX)
@@ -171,11 +186,12 @@ black-ghosts-garage/
 - [x] ~~Formulario mejorado — Mensajes de error descriptivos, success state con animación, validación en tiempo real~~
 - [x] ~~Analytics — Plausible, eventos de conversión (WhatsApp clicks, envío formulario)~~
 - [ ] Accesibilidad — Auditoría WCAG AA, skip-to-content link, focus visible en interactive elements
+- [x] ~~Equipment Section — Bento grid con card flip mobile + lightbox desktop~~
 
 ### 🟢 Prioridad Baja (Pulido)
 
 - [ ] Reemplazar SVG placeholders de Gallery con fotos reales del taller
-- [ ] Optimizar imágenes (actualmente solo 2 logos + SVGs en `/public/images/`)
+- [ ] Reemplazar placeholder images de Equipment con fotos reales del taller
 - [ ] Contenido real — Textos finales en About/Services, testimonios de clientes
 - [ ] Configurar `.env.local` con credenciales SMTP reales para producción
 - [ ] 404 page personalizada con estilo industrial

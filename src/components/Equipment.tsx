@@ -330,7 +330,7 @@ function EquipmentCard({
       <div className={`card-flip-inner ${isFlipped ? "flipped" : ""}`}>
         {/* FRONT - Description */}
         <article
-          className={`card-flip-front group relative flex flex-col border border-line bg-void p-5 transition-all duration-300 hover:border-bone-faint ${
+          className={`card-flip-front group relative flex flex-col border border-line bg-void p-5 transition-all duration-300 hover:border-bone-faint overflow-hidden ${
             hasImage && isTouchDevice ? "tap-feedback cursor-pointer" : ""
           }`}
           onClick={() => hasImage && onFlip(item.id)}
@@ -371,7 +371,7 @@ function EquipmentCard({
           </h3>
 
           {/* Description */}
-          <p className="mt-2 flex-1 text-[13px] leading-relaxed text-bone-dim">
+          <p className="mt-2 flex-1 text-[13px] leading-relaxed text-bone-dim line-clamp-4">
             {item.description}
           </p>
 
