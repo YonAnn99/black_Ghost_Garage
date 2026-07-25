@@ -13,7 +13,7 @@ export default function AudioPlayer() {
 
     hasPlayedRef.current = true;
     audio.muted = false;
-    audio.play().catch(() => {});
+    audio.play().catch((err) => console.warn("Audio play failed:", err));
     setIsMuted(false);
   }, []);
 
@@ -38,7 +38,7 @@ export default function AudioPlayer() {
     if (!hasPlayedRef.current) {
       hasPlayedRef.current = true;
       audio.muted = false;
-      audio.play().catch(() => {});
+      audio.play().catch((err) => console.warn("Audio play failed:", err));
       setIsMuted(false);
       return;
     }
@@ -49,8 +49,9 @@ export default function AudioPlayer() {
 
   return (
     <>
-      <audio ref={audioRef} loop muted>
+      <audio ref={audioRef} loop muted playsInline preload="metadata">
         <source src="/bgm.webm" type="audio/webm" />
+        <source src="/bgm.mp3" type="audio/mpeg" />
       </audio>
 
       <button
