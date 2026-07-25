@@ -340,3 +340,76 @@
     animation: none;
   }
 }
+
+/* ===========================
+   CARD FLIP (Mobile)
+   =========================== */
+
+.card-flip-container {
+  perspective: 1200px;
+}
+
+.card-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s var(--ease-out-expo);
+  transform-style: preserve-3d;
+}
+
+.card-flip-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-flip-front,
+.card-flip-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card-flip-back {
+  transform: rotateY(180deg);
+}
+
+/* Eye indicator animation */
+.eye-indicator {
+  animation: eye-blink 3s ease-in-out infinite;
+}
+
+@keyframes eye-blink {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Only show eye indicator on touch devices */
+@media (hover: hover) and (pointer: fine) {
+  .eye-indicator {
+    display: none;
+  }
+}
+
+/* Tap feedback */
+.tap-feedback {
+  transition: transform 100ms ease;
+}
+
+.tap-feedback:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-flip-inner {
+    transition: none;
+  }
+  
+  .card-flip-inner.flipped {
+    transform: rotateY(180deg);
+  }
+  
+  .eye-indicator {
+    animation: none;
+  }
+}

@@ -26,17 +26,14 @@ function calculateCursorPosition(mouseX: number, mouseY: number): { left: number
   let left = mouseX + LIGHTBOX_OFFSET;
   let top = mouseY - LIGHTBOX_OFFSET;
 
-  // Evitar que se salga por la derecha
   if (left + LIGHTBOX_WIDTH + padding > window.innerWidth) {
     left = mouseX - LIGHTBOX_WIDTH - LIGHTBOX_OFFSET;
   }
 
-  // Evitar que se salga por abajo
   if (top + 320 > window.innerHeight) {
     top = window.innerHeight - 320 - padding;
   }
 
-  // Evitar que se salga por arriba
   if (top < padding) {
     top = padding;
   }
@@ -48,11 +45,41 @@ export default function Equipment() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
+  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   useEffect(() => {
     setIsTouchDevice(window.matchMedia("(hover: none)").matches);
   }, []);
+
+  // IntersectionObserver for auto-reset on scroll
+  useEffect(() => {
+    if (!isTouchDevice) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            const cardId = entry.target.getAttribute("data-card-id");
+            if (cardId) {
+              setFlippedCards((prev) => {
+                const next = new Set(prev);
+                next.delete(cardId);
+                return next;
+              });
+            }
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    cardRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [isTouchDevice]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     setMousePos({ x: e.clientX, y: e.clientY });
@@ -67,13 +94,34 @@ export default function Equipment() {
     setHoveredId(null);
   }, []);
 
+  const handleCardTap = useCallback((id: string) => {
+    if (!isTouchDevice) return;
+    
+    setFlippedCards((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, [isTouchDevice]);
+
+  const registerCardRef = useCallback((id: string) => (el: HTMLDivElement | null) => {
+    if (el) {
+      cardRefs.current.set(id, el);
+    } else {
+      cardRefs.current.delete(id);
+    }
+  }, []);
+
   const hoveredItem = hoveredId
     ? equipmentItems.find((item) => item.id === hoveredId && item.image)
     : null;
 
   return (
     <section
-      ref={sectionRef}
       id="equipo"
       className="relative bg-panel py-24 md:py-32"
       aria-labelledby="equipment-heading"
@@ -130,22 +178,34 @@ export default function Equipment() {
             item={equipmentItems[0]}
             span="md:col-span-2 md:row-span-1"
             delay={200}
+            isFlipped={flippedCards.has(equipmentItems[0].id)}
+            onFlip={handleCardTap}
             onHoverStart={handleHoverStart}
             onHoverEnd={handleHoverEnd}
+            cardRef={registerCardRef(equipmentItems[0].id)}
+            isTouchDevice={isTouchDevice}
           />
           <EquipmentCard
             item={equipmentItems[1]}
             span="md:col-span-1 md:row-span-1"
             delay={260}
+            isFlipped={flippedCards.has(equipmentItems[1].id)}
+            onFlip={handleCardTap}
             onHoverStart={handleHoverStart}
             onHoverEnd={handleHoverEnd}
+            cardRef={registerCardRef(equipmentItems[1].id)}
+            isTouchDevice={isTouchDevice}
           />
           <EquipmentCard
             item={equipmentItems[2]}
             span="md:col-span-1 md:row-span-1"
             delay={300}
+            isFlipped={flippedCards.has(equipmentItems[2].id)}
+            onFlip={handleCardTap}
             onHoverStart={handleHoverStart}
             onHoverEnd={handleHoverEnd}
+            cardRef={registerCardRef(equipmentItems[2].id)}
+            isTouchDevice={isTouchDevice}
           />
 
           {/* Row 3: Equipment medium */}
@@ -153,27 +213,39 @@ export default function Equipment() {
             item={equipmentItems[3]}
             span="md:col-span-1 md:row-span-1"
             delay={340}
+            isFlipped={flippedCards.has(equipmentItems[3].id)}
+            onFlip={handleCardTap}
             onHoverStart={handleHoverStart}
             onHoverEnd={handleHoverEnd}
+            cardRef={registerCardRef(equipmentItems[3].id)}
+            isTouchDevice={isTouchDevice}
           />
           <EquipmentCard
             item={equipmentItems[4]}
             span="md:col-span-1 md:row-span-1"
             delay={400}
+            isFlipped={flippedCards.has(equipmentItems[4].id)}
+            onFlip={handleCardTap}
             onHoverStart={handleHoverStart}
             onHoverEnd={handleHoverEnd}
+            cardRef={registerCardRef(equipmentItems[4].id)}
+            isTouchDevice={isTouchDevice}
           />
           <EquipmentCard
             item={equipmentItems[5]}
             span="md:col-span-2 md:row-span-1"
             delay={450}
+            isFlipped={flippedCards.has(equipmentItems[5].id)}
+            onFlip={handleCardTap}
             onHoverStart={handleHoverStart}
             onHoverEnd={handleHoverEnd}
+            cardRef={registerCardRef(equipmentItems[5].id)}
+            isTouchDevice={isTouchDevice}
           />
         </div>
       </div>
 
-      {/* Lightbox Preview - Cursor Following */}
+      {/* Lightbox Preview - Cursor Following (Desktop only) */}
       {hoveredItem && (
         <LightboxPreview item={hoveredItem} mousePos={mousePos} />
       )}
@@ -228,69 +300,168 @@ function EquipmentCard({
   item,
   span,
   delay,
+  isFlipped,
+  onFlip,
   onHoverStart,
   onHoverEnd,
+  cardRef,
+  isTouchDevice,
 }: {
   item: EquipmentItem;
   span: string;
   delay: number;
+  isFlipped: boolean;
+  onFlip: (id: string) => void;
   onHoverStart: (id: string) => void;
   onHoverEnd: () => void;
+  cardRef: (el: HTMLDivElement | null) => void;
+  isTouchDevice: boolean;
 }) {
   const iconPath = equipmentIcons[item.name];
+  const hasImage = !!item.image;
 
   return (
-    <article
-      className={`reveal group relative flex flex-col border border-line bg-void p-5 transition-all duration-300 hover:border-bone-faint ${span}`}
+    <div
+      ref={cardRef}
+      data-card-id={item.id}
+      className={`card-flip-container reveal ${span}`}
       data-reveal-delay={delay}
-      aria-label={item.name}
-      onMouseEnter={() => onHoverStart(item.id)}
-      onMouseLeave={onHoverEnd}
     >
-      {/* Double-bezel inner border */}
-      <div
-        className="pointer-events-none absolute inset-[3px] border border-line-soft opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        aria-hidden="true"
-      />
-
-      {/* Header: Icon + Category */}
-      <div className="mb-3 flex items-center justify-between">
-        {iconPath && (
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="size-6 shrink-0 text-ghost-red transition-transform duration-300 group-hover:scale-110"
+      <div className={`card-flip-inner ${isFlipped ? "flipped" : ""}`}>
+        {/* FRONT - Description */}
+        <article
+          className={`card-flip-front group relative flex flex-col border border-line bg-void p-5 transition-all duration-300 hover:border-bone-faint ${
+            hasImage && isTouchDevice ? "tap-feedback cursor-pointer" : ""
+          }`}
+          onClick={() => hasImage && onFlip(item.id)}
+          onMouseEnter={() => !isTouchDevice && onHoverStart(item.id)}
+          onMouseLeave={() => !isTouchDevice && onHoverEnd()}
+          aria-label={item.name}
+        >
+          {/* Double-bezel inner border */}
+          <div
+            className="pointer-events-none absolute inset-[3px] border border-line-soft opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             aria-hidden="true"
-          >
-            <path d={iconPath} />
-          </svg>
-        )}
-        <span className="text-data-wide text-[9px] uppercase tracking-[0.1em] text-bone-faint">
-          {item.category}
-        </span>
+          />
+
+          {/* Header: Icon + Category */}
+          <div className="mb-3 flex items-center justify-between">
+            {iconPath && (
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-6 shrink-0 text-ghost-red transition-transform duration-300 group-hover:scale-110"
+                aria-hidden="true"
+              >
+                <path d={iconPath} />
+              </svg>
+            )}
+            <span className="text-data-wide text-[9px] uppercase tracking-[0.1em] text-bone-faint">
+              {item.category}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h3 className="text-display text-lg leading-tight text-bone">
+            {item.name}
+          </h3>
+
+          {/* Description */}
+          <p className="mt-2 flex-1 text-[13px] leading-relaxed text-bone-dim">
+            {item.description}
+          </p>
+
+          {/* Eye indicator (mobile only) */}
+          {hasImage && isTouchDevice && (
+            <div className="eye-indicator mt-4 flex items-center justify-center gap-2 text-[10px] uppercase text-ghost-red/60">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-4"
+              >
+                <path d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+              Ver imagen
+            </div>
+          )}
+
+          {/* Bottom line animation */}
+          <div className="mt-4 h-[2px] w-0 bg-ghost-red transition-all duration-700 ease-[var(--ease-out-expo)] group-hover:w-full" aria-hidden="true" />
+
+          {/* Corner marks */}
+          <div className="absolute left-0 top-0 size-2 border-l border-t border-ghost-red/20 transition-colors duration-300 group-hover:border-ghost-red/50" aria-hidden="true" />
+          <div className="absolute bottom-0 right-0 size-2 border-r border-b border-ghost-red/20 transition-colors duration-300 group-hover:border-ghost-red/50" aria-hidden="true" />
+        </article>
+
+        {/* BACK - Image */}
+        <article
+          className={`card-flip-back group relative flex flex-col border border-ghost-red/30 bg-void overflow-hidden ${
+            hasImage && isTouchDevice ? "tap-feedback cursor-pointer" : ""
+          }`}
+          onClick={() => hasImage && onFlip(item.id)}
+        >
+          {item.image && (
+            <>
+              <img
+                src={item.image}
+                alt={item.name}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-void via-void/20 to-transparent" />
+
+              {/* Scanline effect */}
+              <div className="absolute inset-0 bg-scanlines opacity-[0.05]" />
+
+              {/* Content overlay */}
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-ghost-red animate-pulse-dot" />
+                  <span className="text-data-wide text-[9px] uppercase tracking-[0.12em] text-ghost-red">
+                    {item.category}
+                  </span>
+                </div>
+                <h3 className="text-display text-lg leading-tight text-bone">
+                  {item.name}
+                </h3>
+              </div>
+
+              {/* Flip back indicator */}
+              <div className="absolute top-3 right-3">
+                <span className="eye-indicator flex items-center gap-1.5 text-[9px] uppercase text-bone/60 bg-void/60 px-2 py-1 backdrop-blur-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="size-3"
+                  >
+                    <path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+                  </svg>
+                  Voltear
+                </span>
+              </div>
+
+              {/* Corner accents */}
+              <div className="absolute left-0 top-0 size-3 border-l-2 border-t-2 border-ghost-red/40" />
+              <div className="absolute bottom-0 right-0 size-3 border-r-2 border-b-2 border-ghost-red/40" />
+            </>
+          )}
+        </article>
       </div>
-
-      {/* Title */}
-      <h3 className="text-display text-lg leading-tight text-bone">
-        {item.name}
-      </h3>
-
-      {/* Description */}
-      <p className="mt-2 flex-1 text-[13px] leading-relaxed text-bone-dim">
-        {item.description}
-      </p>
-
-      {/* Bottom line animation */}
-      <div className="mt-4 h-[2px] w-0 bg-ghost-red transition-all duration-700 ease-[var(--ease-out-expo)] group-hover:w-full" aria-hidden="true" />
-
-      {/* Corner marks */}
-      <div className="absolute left-0 top-0 size-2 border-l border-t border-ghost-red/20 transition-colors duration-300 group-hover:border-ghost-red/50" aria-hidden="true" />
-      <div className="absolute bottom-0 right-0 size-2 border-r border-b border-ghost-red/20 transition-colors duration-300 group-hover:border-ghost-red/50" aria-hidden="true" />
-    </article>
+    </div>
   );
 }
 
@@ -307,13 +478,11 @@ function LightboxPreview({
   const [prevItem, setPrevItem] = useState<EquipmentItem | null>(null);
   const isInitialMount = useRef(true);
 
-  // Actualizar posición basada en cursor
   useEffect(() => {
     const pos = calculateCursorPosition(mousePos.x, mousePos.y);
     setPosition(pos);
   }, [mousePos]);
 
-  // Manejar cambio de imagen con crossfade
   useEffect(() => {
     if (isInitialMount.current) {
       setDisplayItem(item);
@@ -349,7 +518,6 @@ function LightboxPreview({
       <div className="overflow-hidden border border-ghost-red/30 bg-void shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
         {/* Image container with crossfade */}
         <div className="relative aspect-[4/3] w-full">
-          {/* Previous image (fading out) */}
           {prevItem?.image && (
             <img
               src={prevItem.image}
@@ -359,7 +527,6 @@ function LightboxPreview({
             />
           )}
 
-          {/* Current image (fading in) */}
           <img
             src={displayItem.image}
             alt={displayItem.name}
@@ -368,16 +535,12 @@ function LightboxPreview({
             }`}
           />
 
-          {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-void/60 via-transparent to-transparent" />
-
-          {/* Scanline effect */}
           <div className="absolute inset-0 bg-scanlines opacity-[0.05]" />
         </div>
 
         {/* Content */}
         <div className="relative p-4">
-          {/* Category badge */}
           <div className="mb-2 flex items-center gap-2">
             <span className="size-1.5 rounded-full bg-ghost-red animate-pulse-dot" />
             <span className="text-data-wide text-[9px] uppercase tracking-[0.12em] text-ghost-red">
@@ -385,16 +548,13 @@ function LightboxPreview({
             </span>
           </div>
 
-          {/* Title */}
           <h4 className="text-display text-base leading-tight text-bone">
             {displayItem.name}
           </h4>
 
-          {/* Decorative line */}
           <div className="mt-3 h-[1px] w-full bg-gradient-to-r from-ghost-red/50 via-ghost-red/20 to-transparent" />
         </div>
 
-        {/* Corner accents */}
         <div className="absolute left-0 top-0 size-3 border-l-2 border-t-2 border-ghost-red/40" />
         <div className="absolute bottom-0 right-0 size-3 border-r-2 border-b-2 border-ghost-red/40" />
       </div>
