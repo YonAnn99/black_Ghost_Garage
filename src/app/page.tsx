@@ -7,6 +7,7 @@ import About from "@/components/About";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import RevealProvider from "@/components/RevealProvider";
+import AudioPlayer from "@/components/AudioPlayer";
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -65,6 +66,7 @@ export default function Home() {
         </main>
         <Footer />
       </RevealProvider>
+      <AudioPlayer />
     </>
   );
 }

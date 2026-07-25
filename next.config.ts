@@ -7,6 +7,7 @@ const ContentSecurityPolicy = `
   script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""};
   style-src 'self' 'unsafe-inline';
   img-src 'self' data:;
+  media-src 'self';
   font-src 'self';
   frame-src maps.google.com;
   form-action 'self';
