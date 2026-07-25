@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { socialLinks } from "@/lib/data";
 
@@ -53,6 +55,14 @@ export default function Footer() {
                 <a
                   key={l.label}
                   href={l.href}
+                  onClick={
+                    l.href === "/aviso-de-privacidad"
+                      ? (e) => {
+                          e.preventDefault();
+                          window.open(l.href, "_blank");
+                        }
+                      : undefined
+                  }
                   className="btn-press text-data-wide text-[10px] uppercase tracking-[0.1em] text-bone-dim transition-colors duration-200 hover:text-ghost-red"
                 >
                   {l.label}

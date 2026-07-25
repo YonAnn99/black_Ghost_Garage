@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import BackToSiteLink from "@/components/BackToSiteLink";
 
 export const metadata: Metadata = {
   title: "Aviso de Privacidad | Black Ghost's Garage",
@@ -12,8 +12,7 @@ export default function AvisoDePrivacidad() {
     <section className="relative bg-void py-24 md:py-32">
       <div className="mx-auto max-w-3xl px-6 md:px-8">
         <div className="mb-14">
-          <Link
-            href="/"
+          <BackToSiteLink
             className="text-data mb-6 inline-flex items-center gap-2 text-[11px] uppercase text-bone-faint transition-colors hover:text-ghost-red"
           >
             <svg
@@ -28,7 +27,7 @@ export default function AvisoDePrivacidad() {
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
             Volver al sitio
-          </Link>
+          </BackToSiteLink>
           <h1 className="text-display mt-4 text-[clamp(2rem,5vw,3.2rem)] leading-none text-bone">
             Aviso de Privacidad
           </h1>

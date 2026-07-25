@@ -231,8 +231,10 @@ Solicito cita para diagnóstico.`;
                     He leído y acepto el{" "}
                     <a
                       href="/aviso-de-privacidad"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.open("/aviso-de-privacidad", "_blank");
+                      }}
                       className="text-ghost-red underline underline-offset-2 hover:text-bone"
                     >
                       Aviso de Privacidad

@@ -41,6 +41,7 @@
 | 2026-07-17 | **Sección Equipment (NUEVA)** | Nuevo componente `Equipment.tsx` — bento grid 4 columnas con 6 items de equipo. Tarjetas con doble-bezel, crosshair corners. Desktop: lightbox preview que sigue al cursor. Mobile: card flip 3D con tap para voltear + IntersectionObserver para auto-reset al scroll. |
 | 2026-07-17 | **Imágenes equipo WebP** | Convertidas 8 imágenes JPG a WebP con sharp. Almacenadas en `public/images/equipment/`. |
 | 2026-07-17 | **Fix layout Equipment** | Corregido colapso de height en mobile (`.card-flip-container` ahora tiene `min-height: 280px`). Agregado `overflow: hidden` a `.card-flip-inner`, `.card-flip-front`, `.card-flip-back` para prevenir desbordamiento de texto. Agregado `line-clamp-4` a descripciones. |
+| 2026-07-25 | **Fix aviso de privacidad — pestaña duplicada** | Link de "Aviso de Privacidad" en Contact.tsx y Footer.tsx ahora usa `window.open()` en onClick. Nuevo componente `BackToSiteLink.tsx` ejecuta `window.close()` en "Volver al sitio" del aviso de privacidad. La pestaña del aviso se cierra automáticamente al volver, evitando pestañas duplicadas. Footer.tsx migrado a `"use client"` para soportar `window.open()`. |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 
@@ -111,7 +112,8 @@ black-ghosts-garage/
 │   │   ├── About.tsx           # Stats + copy
 │   │   ├── Contact.tsx         # Formulario validado + mapa SVG + carrusel reseñas (client)
 │   │   ├── ReviewsCarousel.tsx  # Carrusel infinito reseñas Google Maps (client)
-│   │   ├── Footer.tsx          # Pie de página
+│   │   ├── BackToSiteLink.tsx   # Link "Volver al sitio" con window.close() (client)
+│   │   ├── Footer.tsx          # Pie de página (client)
 │   │   └── RevealProvider.tsx  # Wrapper scroll-reveal (client)
 │   └── lib/
 │       ├── data.ts             # Datos estáticos (servicios, nav, contacto, galería)
