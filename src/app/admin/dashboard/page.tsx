@@ -37,7 +37,8 @@ export default function DashboardPage() {
     imageUrl: "",
   });
 
-  const categories = [...new Set(items.map((i) => i.category))];
+  const defaultCategories = ["Estético", "Carro", "Motocicletas"];
+const categories = [...new Set([...defaultCategories, ...items.map((i) => i.category)])];
 
   useEffect(() => {
     fetchItems();
