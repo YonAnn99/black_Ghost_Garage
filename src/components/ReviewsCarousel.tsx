@@ -49,6 +49,9 @@ const reviews = [
 
 const CARD_WIDTH = 320;
 const CARD_GAP = 20;
+const CARD_STEP = CARD_WIDTH + CARD_GAP;
+const SWIPE_VELOCITY_THRESHOLD = 0.3;
+const SWIPE_DISTANCE_THRESHOLD = 50;
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -74,12 +77,22 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function ReviewsCarousel() {
   const duplicatedReviews = [...reviews, ...reviews];
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [offset, setOffset] = useState(0);
-  const dragStart = useRef({ x: 0, offset: 0 });
+
+  const offsetRef = useRef(0);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const startOffset = useRef(0);
+  const lastX = useRef(0);
+  const lastTime = useRef(0);
+  const velocityHistory = useRef<{ x: number; t: number }[]>([]);
   const resumeTimer = useRef<ReturnType<typeof setTimeout>>(null);
+  const autoScrollTimer = useRef<ReturnType<typeof setInterval>>(null);
+
+  const totalWidth = duplicatedReviews.length * CARD_STEP;
+  const halfWidth = totalWidth / 2;
 
   useEffect(() => {
     const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
@@ -89,63 +102,152 @@ export default function ReviewsCarousel() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  const totalWidth = duplicatedReviews.length * (CARD_WIDTH + CARD_GAP);
+  const applyOffset = useCallback((value: number, smooth = false) => {
+    const track = trackRef.current;
+    if (!track) return;
+    offsetRef.current = value;
+    if (smooth) {
+      track.style.transition = "transform 0.35s cubic-bezier(0.25, 1, 0.5, 1)";
+    } else {
+      track.style.transition = "none";
+    }
+    track.style.transform = `translateX(${value}px)`;
+  }, []);
 
-  const snapToNearest = useCallback(
-    (currentOffset: number) => {
-      const cardStep = CARD_WIDTH + CARD_GAP;
-      const maxOffset = 0;
-      const minOffset = -(totalWidth / 2);
+  const clampOffset = useCallback((value: number) => {
+    return Math.max(-halfWidth, Math.min(0, value));
+  }, [halfWidth]);
 
-      const clamped = Math.max(minOffset, Math.min(maxOffset, currentOffset));
-      const snapped = Math.round(clamped / cardStep) * cardStep;
-      return Math.max(minOffset, Math.min(maxOffset, snapped));
-    },
-    [totalWidth]
-  );
+  const snapToCard = useCallback((currentOffset: number) => {
+    const snapped = Math.round(currentOffset / CARD_STEP) * CARD_STEP;
+    return clampOffset(snapped);
+  }, [clampOffset]);
+
+  const startAutoScroll = useCallback(() => {
+    if (autoScrollTimer.current) clearInterval(autoScrollTimer.current);
+    autoScrollTimer.current = setInterval(() => {
+      if (isDragging.current) return;
+      const track = trackRef.current;
+      if (!track) return;
+
+      let newOffset = offsetRef.current - 1;
+      if (newOffset < -halfWidth) {
+        newOffset = 0;
+      }
+      applyOffset(newOffset, false);
+    }, 50);
+  }, [halfWidth, applyOffset]);
+
+  const stopAutoScroll = useCallback(() => {
+    if (autoScrollTimer.current) {
+      clearInterval(autoScrollTimer.current);
+      autoScrollTimer.current = null;
+    }
+  }, []);
+
+  const scheduleResume = useCallback(() => {
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(() => {
+      const snapped = snapToCard(offsetRef.current);
+      applyOffset(snapped, true);
+      setTimeout(() => startAutoScroll(), 500);
+    }, 5000);
+  }, [snapToCard, applyOffset, startAutoScroll]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      startAutoScroll();
+    }
+    return () => {
+      stopAutoScroll();
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    };
+  }, [isMobile, startAutoScroll, stopAutoScroll]);
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      setIsDragging(true);
+      isDragging.current = true;
+      stopAutoScroll();
       if (resumeTimer.current) clearTimeout(resumeTimer.current);
-      dragStart.current = {
-        x: e.touches[0].clientX,
-        offset: offset,
-      };
+
+      const x = e.touches[0].clientX;
+      startX.current = x;
+      startOffset.current = offsetRef.current;
+      lastX.current = x;
+      lastTime.current = Date.now();
+      velocityHistory.current = [{ x, t: lastTime.current }];
+
+      applyOffset(offsetRef.current, false);
     },
-    [offset]
+    [stopAutoScroll, applyOffset]
   );
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent) => {
-      if (!isDragging) return;
-      const delta = e.touches[0].clientX - dragStart.current.x;
-      const newOffset = dragStart.current.offset + delta;
-      setOffset(newOffset);
+      if (!isDragging.current) return;
+
+      const x = e.touches[0].clientX;
+      const delta = x - startX.current;
+      let newOffset = startOffset.current + delta;
+
+      const now = Date.now();
+      velocityHistory.current.push({ x, t: now });
+      if (velocityHistory.current.length > 5) {
+        velocityHistory.current.shift();
+      }
+
+      const rubberBandFactor =
+        newOffset > 0 || newOffset < -halfWidth ? 0.3 : 1;
+      if (newOffset > 0) {
+        newOffset = newOffset * rubberBandFactor;
+      } else if (newOffset < -halfWidth) {
+        const overscroll = newOffset + halfWidth;
+        newOffset = -halfWidth + overscroll * rubberBandFactor;
+      }
+
+      lastX.current = x;
+      lastTime.current = now;
+      applyOffset(newOffset, false);
     },
-    [isDragging]
+    [halfWidth, applyOffset]
   );
 
   const handleTouchEnd = useCallback(() => {
-    setIsDragging(false);
-    const snapped = snapToNearest(offset);
-    setOffset(snapped);
+    if (!isDragging.current) return;
+    isDragging.current = false;
 
-    resumeTimer.current = setTimeout(() => {
-      const cardStep = CARD_WIDTH + CARD_GAP;
-      const posFromZero = snapped % (totalWidth / 2);
-      setOffset(posFromZero);
-    }, 3000);
-  }, [offset, snapToNearest, totalWidth]);
+    const history = velocityHistory.current;
+    let velocity = 0;
 
-  useEffect(() => {
-    return () => {
-      if (resumeTimer.current) clearTimeout(resumeTimer.current);
-    };
-  }, []);
+    if (history.length >= 2) {
+      const last = history[history.length - 1];
+      const first = history[0];
+      const dt = (last.t - first.t) / 1000;
+      if (dt > 0 && dt < 0.5) {
+        velocity = (last.x - first.x) / dt / 1000;
+      }
+    }
+
+    const currentOffset = offsetRef.current;
+    let targetOffset: number;
+
+    if (Math.abs(velocity) > SWIPE_VELOCITY_THRESHOLD) {
+      const direction = velocity > 0 ? 1 : -1;
+      targetOffset = currentOffset + direction * CARD_STEP;
+    } else if (Math.abs(currentOffset % CARD_STEP) > SWIPE_DISTANCE_THRESHOLD) {
+      const direction = currentOffset % CARD_STEP > 0 ? 1 : -1;
+      targetOffset = currentOffset + direction * CARD_STEP;
+    } else {
+      targetOffset = snapToCard(currentOffset);
+    }
+
+    targetOffset = clampOffset(targetOffset);
+    applyOffset(targetOffset, true);
+    scheduleResume();
+  }, [snapToCard, clampOffset, applyOffset, scheduleResume]);
 
   const animationStyle = isMobile
-    ? { transform: `translateX(${offset}px)`, animation: "none" }
+    ? { willChange: "transform" as const }
     : {};
 
   return (
@@ -175,16 +277,17 @@ export default function ReviewsCarousel() {
       </div>
 
       <div
+        ref={containerRef}
         className={`group relative overflow-hidden ${
-          isMobile ? "cursor-grab active:cursor-grabbing" : ""
+          isMobile ? "cursor-grab active:cursor-grabbing touch-pan-y" : ""
         }`}
       >
         <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-void to-transparent" />
         <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-void to-transparent" />
 
         <div
-          ref={scrollRef}
-          className={`reviews-scroll flex gap-5 ${isDragging ? "reviews-scroll-paused" : ""}`}
+          ref={trackRef}
+          className={`reviews-scroll flex gap-5 ${!isMobile ? "" : ""}`}
           style={animationStyle}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
