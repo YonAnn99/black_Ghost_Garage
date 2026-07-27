@@ -129,66 +129,6 @@ export const equipmentItems: EquipmentItem[] = [
   },
 ];
 
-export type GalleryItem = {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  image: string;
-  tags: string[];
-};
-
-export const galleryItems: GalleryItem[] = [
-  {
-    id: "g-001",
-    title: "Mustang GT — Full Carbono",
-    category: "Estético",
-    description: "Skinning completo de capó, cofre y espejos en fibra de carbono twill 2x2. Acabado UV de alta resistencia.",
-    image: "/images/gallery-placeholder.svg",
-    tags: ["Fibra de carbono", "Pintura", "Ford"],
-  },
-  {
-    id: "g-002",
-    title: "BMW M3 — Suspensión Coilover",
-    category: "Carro",
-    description: "Instalación de kit de suspensión coilover ajustable. Alineación completa y balanceo de peso.",
-    image: "/images/gallery-placeholder.svg",
-    tags: ["Suspensión", "BMW", "Rendimiento"],
-  },
-  {
-    id: "g-003",
-    title: "MT-07 — Afinación Integral",
-    category: "Motocicletas",
-    description: "Cambio de aceite, filtros, revisión de frenos delanteros y traseros. Sistema eléctrico verificado.",
-    image: "/images/gallery-placeholder.svg",
-    tags: ["Yamaha", "Mantenimiento", "Frenos"],
-  },
-  {
-    id: "g-004",
-    title: "Civic Type R — Pintura Cerámica",
-    category: "Estético",
-    description: "Corrección de pintura en 3 etapas. Pulido de faros. Aplicación de recubrimiento cerámico hidrofóbico.",
-    image: "/images/gallery-placeholder.svg",
-    tags: ["Honda", "Pintura", "Protección"],
-  },
-  {
-    id: "g-005",
-    title: "Jeep Wrangler — Rines Forjados",
-    category: "Estético",
-    description: "Pintado de rines en negro mate de alta temperatura. Montaje de llantas todo terreno 33\".",
-    image: "/images/gallery-placeholder.svg",
-    tags: ["Jeep", "Rines", "Off-road"],
-  },
-  {
-    id: "g-006",
-    title: "Ducati Monster — Sistema Eléctrico",
-    category: "Carro",
-    description: "Diagnóstico y reparación de sistema de carga. Reemplazo de regulador y cableado principal.",
-    image: "/images/gallery-placeholder.svg",
-    tags: ["Ducati", "Eléctrico", "Diagnóstico"],
-  },
-];
-
 export const navLinks = [
   { href: "#servicios", label: "Servicios" },
   { href: "#equipo", label: "Equipo" },

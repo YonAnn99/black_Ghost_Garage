@@ -333,6 +333,11 @@
   animation: scroll-reviews 20s linear infinite;
 }
 
+.reviews-touch-active {
+  animation: none !important;
+  touch-action: pan-y;
+}
+
 .reviews-scroll-paused {
   animation-play-state: paused !important;
 }

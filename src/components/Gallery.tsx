@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { galleryItems as fallbackItems } from "@/lib/data";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 
 type PortfolioItem = {
   id: string;
@@ -16,7 +14,7 @@ type PortfolioItem = {
 
 export default function Gallery() {
   const [active, setActive] = useState("Todos");
-  const [items, setItems] = useState<PortfolioItem[]>(fallbackItems);
+  const [items, setItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,11 +23,9 @@ export default function Gallery() {
         const res = await fetch("/api/portfolio");
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
-        if (data.length > 0) {
-          setItems(data);
-        }
+        setItems(data);
       } catch {
-        console.warn("Using fallback portfolio data");
+        console.warn("Could not fetch portfolio");
       } finally {
         setLoading(false);
       }
@@ -38,6 +34,7 @@ export default function Gallery() {
     fetchPortfolio();
   }, []);
 
+  const hasItems = items.length > 0;
   const categories = ["Todos", ...new Set(items.map((g) => g.category))];
 
   const filtered =
@@ -71,70 +68,141 @@ export default function Gallery() {
             </p>
           </div>
 
-          {/* Filter tabs */}
-          <div
-            className="reveal flex flex-wrap gap-2"
-            data-reveal-delay="100"
-            role="tablist"
-            aria-label="Filtrar por categoría"
-          >
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                role="tab"
-                aria-selected={active === cat}
-                onClick={() => setActive(cat)}
-                className={`btn-press text-data-wide px-4 py-2 text-[10px] uppercase tracking-[0.12em] border transition-all duration-200 ${
-                  active === cat
-                    ? "border-ghost-red bg-ghost-red text-void"
-                    : "border-line bg-transparent text-bone-faint hover:border-bone-faint hover:text-bone-dim"
-                }`}
+          {/* Filter tabs — solo si hay items */}
+          {hasItems && (
+            <div
+              className="reveal flex flex-wrap gap-2"
+              data-reveal-delay="100"
+              role="tablist"
+              aria-label="Filtrar por categoría"
+            >
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  role="tab"
+                  aria-selected={active === cat}
+                  onClick={() => setActive(cat)}
+                  className={`btn-press text-data-wide px-4 py-2 text-[10px] uppercase tracking-[0.12em] border transition-all duration-200 ${
+                    active === cat
+                      ? "border-ghost-red bg-ghost-red text-void"
+                      : "border-line bg-transparent text-bone-faint hover:border-bone-faint hover:text-bone-dim"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={`skeleton-${idx}`}
+                className="border border-line bg-void animate-pulse"
               >
-                {cat}
-              </button>
+                <div className="aspect-[16/10] bg-panel" />
+                <div className="p-5 space-y-3">
+                  <div className="h-3 w-16 bg-panel-raised" />
+                  <div className="h-5 w-3/4 bg-panel-raised" />
+                  <div className="h-3 w-full bg-panel-raised" />
+                </div>
+              </div>
             ))}
           </div>
-        </div>
-
-        {/* Grid — key fuerza re-montado al cambiar filtro */}
-        <div
-          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-          role="tabpanel"
-          key={active}
-        >
-          {loading
-            ? Array.from({ length: 6 }).map((_, idx) => (
-                <div
-                  key={`skeleton-${idx}`}
-                  className="border border-line bg-void animate-pulse"
-                >
-                  <div className="aspect-[16/10] bg-panel" />
-                  <div className="p-5 space-y-3">
-                    <div className="h-3 w-16 bg-panel-raised" />
-                    <div className="h-5 w-3/4 bg-panel-raised" />
-                    <div className="h-3 w-full bg-panel-raised" />
-                  </div>
-                </div>
-              ))
-            : filtered.map((item, idx) => (
+        ) : hasItems ? (
+          <>
+            <div
+              className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              role="tabpanel"
+              key={active}
+            >
+              {filtered.map((item, idx) => (
                 <GalleryCard key={item.id} item={item} index={idx} />
               ))}
-        </div>
+            </div>
 
-        {/* Counter */}
-        <div
-          className="reveal mt-10 flex items-center justify-between border-t border-line-soft pt-6 text-[10px] uppercase text-bone-faint"
-          data-reveal-delay="200"
-        >
-          <span className="text-data-wide">
-            Mostrando {filtered.length} de {items.length} operaciones
-          </span>
-          <span className="text-data-wide hidden sm:inline">///</span>
-          <span className="text-data-wide">
-            Categoría: {active}
-          </span>
-        </div>
+            <div
+              className="reveal mt-10 flex items-center justify-between border-t border-line-soft pt-6 text-[10px] uppercase text-bone-faint"
+              data-reveal-delay="200"
+            >
+              <span className="text-data-wide">
+                Mostrando {filtered.length} de {items.length} operaciones
+              </span>
+              <span className="text-data-wide hidden sm:inline">///</span>
+              <span className="text-data-wide">
+                Categoría: {active}
+              </span>
+            </div>
+          </>
+        ) : (
+          /* Coming Soon CTA */
+          <div className="flex flex-col items-center">
+            <div className="relative border border-line bg-void p-12 md:p-16 text-center max-w-2xl w-full">
+              {/* Double-bezel inset */}
+              <div className="pointer-events-none absolute inset-[3px] border border-line-soft" aria-hidden="true" />
+
+              {/* Grid background */}
+              <div className="absolute inset-0 bg-grid-noir opacity-30" aria-hidden="true" />
+
+              {/* Corner markers */}
+              <div className="absolute left-4 top-4 size-3 border-l border-t border-ghost-red/30" aria-hidden="true" />
+              <div className="absolute right-4 top-4 size-3 border-r border-t border-ghost-red/30" aria-hidden="true" />
+              <div className="absolute bottom-4 left-4 size-3 border-l border-b border-ghost-red/30" aria-hidden="true" />
+              <div className="absolute bottom-4 right-4 size-3 border-r border-b border-ghost-red/30" aria-hidden="true" />
+
+              <div className="relative">
+                {/* Icon */}
+                <div className="mb-6 inline-flex items-center justify-center border border-ghost-red/20 p-4">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="size-8 text-ghost-red/60"
+                    aria-hidden="true"
+                  >
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                  </svg>
+                </div>
+
+                <span className="text-data-wide block text-[10px] uppercase text-ghost-red tracking-[0.2em] mb-3">
+                  ◆ Portafolio en construcción
+                </span>
+
+                <h3 className="text-display text-[clamp(1.8rem,4vw,2.8rem)] leading-[0.9] text-bone mb-4">
+                  Próximamente
+                </h3>
+
+                <p className="text-[15px] leading-relaxed text-bone-dim max-w-md mx-auto mb-8">
+                  Estamos documentando nuestros mejores trabajos.
+                  Vuelve pronto para conocer nuestro portafolio completo.
+                </p>
+
+                <a
+                  href="#contacto"
+                  className="btn-press group inline-flex items-center gap-3 border border-ghost-red bg-ghost-red px-8 py-4 text-[11px] uppercase text-void tracking-[0.12em] transition-colors duration-200 hover:bg-bone hover:text-void"
+                >
+                  <span>Agendar cita</span>
+                  <span
+                    className="inline-flex size-5 items-center justify-center rounded-full bg-void/15 transition-all duration-200 group-hover:translate-x-0.5 group-hover:bg-void/25"
+                    aria-hidden="true"
+                  >
+                    →
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -147,35 +215,13 @@ function GalleryCard({
   item: PortfolioItem;
   index: number;
 }) {
-  const cardRef = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
   const [imgError, setImgError] = useState(false);
-
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -20px 0px" }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   const hasRealImage = item.image && !item.image.includes("placeholder") && !imgError;
 
   return (
     <article
-      ref={cardRef}
-      className={`group relative border border-line bg-void transition-all duration-300 hover:border-bone-faint ${
-        visible
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-4"
-      }`}
+      className="group relative border border-line bg-void transition-all duration-300 hover:border-bone-faint opacity-100 translate-y-0"
       style={{ transitionDuration: `${500 + index * 60}ms`, transitionTimingFunction: "var(--ease-out-expo)" }}
       aria-label={`Proyecto: ${item.title}`}
     >
@@ -188,12 +234,10 @@ function GalleryCard({
       {/* Image area */}
       <div className="relative aspect-[16/10] overflow-hidden bg-panel">
         {hasRealImage ? (
-          <Image
+          <img
             src={item.image}
             alt={item.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={() => setImgError(true)}
           />
         ) : (
