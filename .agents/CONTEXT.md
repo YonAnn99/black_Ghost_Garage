@@ -45,12 +45,15 @@
 | 2026-07-26 | **Fix AudioPlayer — audio no carga en móvil** | `AudioPlayer.tsx` reescrito: `preload="metadata"` → `preload="auto"` para descarga anticipada. Eliminado listener de `document` que iOS Safari no reconoce como gesto directo. Agregado `onTouchEnd` al botón para reproducir audio directamente desde el gesto del usuario. Agregado estado `isLoading` con spinner SVG para feedback visual. |
 | 2026-07-26 | **Velocidad carrusel reseñas** | `globals.css` — animación `scroll-reviews` reducida de `40s` a `20s` para que el carrusel se desplace 2x más rápido. |
 | 2026-07-26 | **Iconos redes sociales — Contact + Footer** | `data.ts` — campo `icon` agregado a `socialLinks` (`"instagram"`, `"facebook"`). `Contact.tsx` — nuevo bloque "Síguenos" debajo del horario con iconos SVG cuadrados (40x40, hover glow rojo). `Footer.tsx` — iconos SVG inline junto a los enlaces existentes. |
+| 2026-07-26 | **ReviewsCarousel — touch drag en móvil** | `ReviewsCarousel.tsx` reescrito con soporte táctil: `onTouchStart/Move/End` para drag manual en móvil. Snap a tarjeta más cercana al soltar. Detección de dispositivo táctil con `matchMedia("(hover: none)")`. Desktop mantiene CSS auto-scroll. Hint "Desliza para ver más" en móvil. |
+| 2026-07-26 | **AudioPlayer — rediseño visual** | `AudioPlayer.tsx` — botón aumentado a `size-12` (48px). Borde `ghost-red/40` → hover `ghost-red/70`. Anillo pulsante CSS (`pulse-ring` keyframe) cuando muted para invitar a tocar. Icono `size-5`. Fondo `bg-void/90`. |
+| 2026-07-26 | **globals.css — reviews pausado + pulse-ring** | Agregado `.reviews-scroll-paused` con `animation-play-state: paused`. Nuevo keyframe `pulse-ring` (scale 1→1.6, opacity 0.6→0) para anillo del botón de audio. |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 
 | Archivo | Cambios |
 |---|---|
-| `globals.css` | Nuevas curvas: `--ease-out-expo`, `--ease-out-quart`, `--ease-spring`. Keyframes: `system-boot`, `data-stream`, `hud-line`, `glitch-clip`, `eye-blink`. Utilidades: `.crosshair`, `.btn-press`, `.glow-red`, `.hover-lift`, `.text-data-wide`. Card flip: `.card-flip-container`, `.card-flip-inner`, `.card-flip-front`, `.card-flip-back`. Reveal con blur de entrada. Stagger delays via data-attribute. |
+| `globals.css` | Nuevas curvas: `--ease-out-expo`, `--ease-out-quart`, `--ease-spring`. Keyframes: `system-boot`, `data-stream`, `hud-line`, `glitch-clip`, `eye-blink`, `pulse-ring`. Utilidades: `.crosshair`, `.btn-press`, `.glow-red`, `.hover-lift`, `.text-data-wide`, `.reviews-scroll-paused`. Card flip: `.card-flip-container`, `.card-flip-inner`, `.card-flip-front`, `.card-flip-back`. Reveal con blur de entrada. Stagger delays via data-attribute. |
 | `Hero.tsx` | Double-bezel emblem (borde + padding). Tipografía masiva `clamp(2.8rem,9vw,6rem)` con `leading-[0.88]`. CTAs con `btn-press` (scale 0.97). HUD corners + telemetry strip con separators `///`. ARIA labels. `min-h-[100dvh]`. |
 | `Services.tsx` | Double-bezel inset border en hover. Crosshair corners. Unit IDs con brackets `[UNIT.0X]`. Icon scale en hover. Progress bar con `ease-[var(--ease-out-expo)]`. `<article>` semántico con `role="listitem"`. ARIA labels. |
 | `Gallery.tsx` | **NUEVO** — Componente client con useState para filtros. Grid responsive 1/2/3 columnas. Cards con double-bezel inset, crosshair corners, SVG placeholders noir, badges de categoría, tags. Filtros por categoría con `role="tablist"`. Counter de operaciones. |
@@ -114,7 +117,8 @@ black-ghosts-garage/
 │   │   ├── Gallery.tsx         # Portafolio de trabajos con filtros (client)
 │   │   ├── About.tsx           # Stats + copy
 │   │   ├── Contact.tsx         # Formulario validado + mapa SVG + carrusel reseñas (client)
-│   │   ├── ReviewsCarousel.tsx  # Carrusel infinito reseñas Google Maps (client)
+│   │   ├── ReviewsCarousel.tsx  # Carrusel infinito reseñas + touch drag en móvil (client)
+│   │   ├── AudioPlayer.tsx     # Botón de audio con anillo pulsante (client)
 │   │   ├── BackToSiteLink.tsx   # Link "Volver al sitio" con window.close() (client)
 │   │   ├── Footer.tsx          # Pie de página (client)
 │   │   └── RevealProvider.tsx  # Wrapper scroll-reveal (client)

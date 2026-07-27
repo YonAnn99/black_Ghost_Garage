@@ -1,5 +1,7 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
+
 const reviews = [
   {
     name: "Cynthia Gabriela Flores Ramirez",
@@ -45,6 +47,9 @@ const reviews = [
   },
 ];
 
+const CARD_WIDTH = 320;
+const CARD_GAP = 20;
+
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex gap-0.5">
@@ -69,6 +74,79 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function ReviewsCarousel() {
   const duplicatedReviews = [...reviews, ...reviews];
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const dragStart = useRef({ x: 0, offset: 0 });
+  const resumeTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const totalWidth = duplicatedReviews.length * (CARD_WIDTH + CARD_GAP);
+
+  const snapToNearest = useCallback(
+    (currentOffset: number) => {
+      const cardStep = CARD_WIDTH + CARD_GAP;
+      const maxOffset = 0;
+      const minOffset = -(totalWidth / 2);
+
+      const clamped = Math.max(minOffset, Math.min(maxOffset, currentOffset));
+      const snapped = Math.round(clamped / cardStep) * cardStep;
+      return Math.max(minOffset, Math.min(maxOffset, snapped));
+    },
+    [totalWidth]
+  );
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      setIsDragging(true);
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+      dragStart.current = {
+        x: e.touches[0].clientX,
+        offset: offset,
+      };
+    },
+    [offset]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (!isDragging) return;
+      const delta = e.touches[0].clientX - dragStart.current.x;
+      const newOffset = dragStart.current.offset + delta;
+      setOffset(newOffset);
+    },
+    [isDragging]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+    const snapped = snapToNearest(offset);
+    setOffset(snapped);
+
+    resumeTimer.current = setTimeout(() => {
+      const cardStep = CARD_WIDTH + CARD_GAP;
+      const posFromZero = snapped % (totalWidth / 2);
+      setOffset(posFromZero);
+    }, 3000);
+  }, [offset, snapToNearest, totalWidth]);
+
+  useEffect(() => {
+    return () => {
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    };
+  }, []);
+
+  const animationStyle = isMobile
+    ? { transform: `translateX(${offset}px)`, animation: "none" }
+    : {};
 
   return (
     <div className="reveal mt-16" data-reveal-delay="200">
@@ -96,11 +174,22 @@ export default function ReviewsCarousel() {
         </div>
       </div>
 
-      <div className="group relative overflow-hidden">
+      <div
+        className={`group relative overflow-hidden ${
+          isMobile ? "cursor-grab active:cursor-grabbing" : ""
+        }`}
+      >
         <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-void to-transparent" />
         <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-void to-transparent" />
 
-        <div className="reviews-scroll flex gap-5">
+        <div
+          ref={scrollRef}
+          className={`reviews-scroll flex gap-5 ${isDragging ? "reviews-scroll-paused" : ""}`}
+          style={animationStyle}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {duplicatedReviews.map((review, index) => (
             <div
               key={`${review.name}-${index}`}
@@ -149,6 +238,12 @@ export default function ReviewsCarousel() {
           ))}
         </div>
       </div>
+
+      {isMobile && (
+        <p className="mt-4 text-center text-[10px] uppercase text-bone-faint/50 tracking-[0.12em]">
+          ← Desliza para ver más →
+        </p>
+      )}
     </div>
   );
 }
