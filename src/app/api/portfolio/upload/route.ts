@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 import { createClient } from "@/lib/supabase-server";
 
 export async function POST(request: NextRequest) {
@@ -34,12 +35,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg";
-  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const inputBuffer = Buffer.from(await file.arrayBuffer());
+
+  const webpBuffer = await sharp(inputBuffer)
+    .resize({ width: 1200, withoutEnlargement: true })
+    .webp({ quality: 82, effort: 6 })
+    .toBuffer();
+
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
 
   const { error } = await supabase.storage
     .from("portfolio")
-    .upload(fileName, file, { contentType: file.type });
+    .upload(fileName, webpBuffer, {
+      contentType: "image/webp",
+      cacheControl: "31536000",
+    });
 
   if (error) {
     console.error("Upload error:", error);
@@ -50,5 +60,12 @@ export async function POST(request: NextRequest) {
     .from("portfolio")
     .getPublicUrl(fileName);
 
-  return NextResponse.json({ url: urlData.publicUrl });
+  return NextResponse.json({
+    url: urlData.publicUrl,
+    info: {
+      originalSize: `${(file.size / 1024).toFixed(1)} KB`,
+      webpSize: `${(webpBuffer.length / 1024).toFixed(1)} KB`,
+      savings: `${Math.round((1 - webpBuffer.length / file.size) * 100)}%`,
+    },
+  });
 }
