@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { contactInfo } from "@/lib/data";
+import { contactInfo, socialLinks } from "@/lib/data";
 import { trackEvent } from "@/lib/analytics";
 import ReviewsCarousel from "./ReviewsCarousel";
 
@@ -348,6 +348,36 @@ Solicito cita para diagnóstico.`;
                   </li>
                 ))}
               </ul>
+            </div>
+
+            <div className="mt-7 border-t border-line-soft pt-6">
+              <p className="text-data mb-4 text-[11px] uppercase text-bone-faint">
+                Síguenos
+              </p>
+              <div className="flex items-center gap-4">
+                {socialLinks.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex size-10 items-center justify-center border border-line bg-panel text-bone-faint transition-all duration-300 hover:border-ghost-red/50 hover:text-ghost-red hover:shadow-[0_0_12px_rgba(232,48,42,0.15)]"
+                    aria-label={s.label}
+                  >
+                    {s.icon === "instagram" ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="size-4">
+                        <rect x="2" y="2" width="20" height="20" rx="5" />
+                        <circle cx="12" cy="12" r="5" />
+                        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="size-4">
+                        <path d="M24 12c0-6.627-5.373-12-12-12S0 5.373 0 12c0 5.99 4.388 10.954 10.125 11.854V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.668 4.533-4.668 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.875V12h3.328l-.532 3.469h-2.796v8.385C19.612 22.954 24 17.99 24 12z" />
+                      </svg>
+                    )}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </div>

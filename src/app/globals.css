@@ -319,7 +319,7 @@
 }
 
 .reviews-scroll {
-  animation: scroll-reviews 40s linear infinite;
+  animation: scroll-reviews 20s linear infinite;
 }
 
 .group:hover .reviews-scroll {

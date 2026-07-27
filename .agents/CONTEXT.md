@@ -42,6 +42,9 @@
 | 2026-07-17 | **Imágenes equipo WebP** | Convertidas 8 imágenes JPG a WebP con sharp. Almacenadas en `public/images/equipment/`. |
 | 2026-07-17 | **Fix layout Equipment** | Corregido colapso de height en mobile (`.card-flip-container` ahora tiene `min-height: 280px`). Agregado `overflow: hidden` a `.card-flip-inner`, `.card-flip-front`, `.card-flip-back` para prevenir desbordamiento de texto. Agregado `line-clamp-4` a descripciones. |
 | 2026-07-25 | **Fix aviso de privacidad — pestaña duplicada** | Link de "Aviso de Privacidad" en Contact.tsx y Footer.tsx ahora usa `window.open()` en onClick. Nuevo componente `BackToSiteLink.tsx` ejecuta `window.close()` en "Volver al sitio" del aviso de privacidad. La pestaña del aviso se cierra automáticamente al volver, evitando pestañas duplicadas. Footer.tsx migrado a `"use client"` para soportar `window.open()`. |
+| 2026-07-26 | **Fix AudioPlayer — audio no carga en móvil** | `AudioPlayer.tsx` reescrito: `preload="metadata"` → `preload="auto"` para descarga anticipada. Eliminado listener de `document` que iOS Safari no reconoce como gesto directo. Agregado `onTouchEnd` al botón para reproducir audio directamente desde el gesto del usuario. Agregado estado `isLoading` con spinner SVG para feedback visual. |
+| 2026-07-26 | **Velocidad carrusel reseñas** | `globals.css` — animación `scroll-reviews` reducida de `40s` a `20s` para que el carrusel se desplace 2x más rápido. |
+| 2026-07-26 | **Iconos redes sociales — Contact + Footer** | `data.ts` — campo `icon` agregado a `socialLinks` (`"instagram"`, `"facebook"`). `Contact.tsx` — nuevo bloque "Síguenos" debajo del horario con iconos SVG cuadrados (40x40, hover glow rojo). `Footer.tsx` — iconos SVG inline junto a los enlaces existentes. |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 

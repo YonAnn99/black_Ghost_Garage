@@ -1,45 +1,52 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function AudioPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const hasPlayedRef = useRef(false);
 
-  const unmuteAndPlay = useCallback(() => {
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const onCanPlay = () => setIsLoading(false);
+    const onWaiting = () => {
+      if (!hasPlayedRef.current) setIsLoading(true);
+    };
+
+    audio.addEventListener("canplay", onCanPlay);
+    audio.addEventListener("waiting", onWaiting);
+
+    return () => {
+      audio.removeEventListener("canplay", onCanPlay);
+      audio.removeEventListener("waiting", onWaiting);
+    };
+  }, []);
+
+  const startPlayback = () => {
     const audio = audioRef.current;
     if (!audio || hasPlayedRef.current) return;
 
     hasPlayedRef.current = true;
+    setIsLoading(true);
     audio.muted = false;
-    audio.play().catch((err) => console.warn("Audio play failed:", err));
-    setIsMuted(false);
-  }, []);
-
-  useEffect(() => {
-    const handleInteraction = () => {
-      unmuteAndPlay();
-    };
-
-    document.addEventListener("click", handleInteraction, { once: true });
-    document.addEventListener("touchstart", handleInteraction, { once: true });
-
-    return () => {
-      document.removeEventListener("click", handleInteraction);
-      document.removeEventListener("touchstart", handleInteraction);
-    };
-  }, [unmuteAndPlay]);
+    audio.play()
+      .then(() => setIsMuted(false))
+      .catch((err) => {
+        console.warn("Audio play failed:", err);
+        setIsLoading(false);
+      });
+  };
 
   const toggleMute = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
     if (!hasPlayedRef.current) {
-      hasPlayedRef.current = true;
-      audio.muted = false;
-      audio.play().catch((err) => console.warn("Audio play failed:", err));
-      setIsMuted(false);
+      startPlayback();
       return;
     }
 
@@ -49,17 +56,33 @@ export default function AudioPlayer() {
 
   return (
     <>
-      <audio ref={audioRef} loop muted playsInline preload="metadata">
+      <audio ref={audioRef} loop muted playsInline preload="auto">
         <source src="/bgm.webm" type="audio/webm" />
         <source src="/bgm.mp3" type="audio/mpeg" />
       </audio>
 
       <button
         onClick={toggleMute}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          toggleMute();
+        }}
         className="fixed bottom-6 right-6 z-50 flex size-10 items-center justify-center border border-ghost-red/20 bg-void/80 text-bone-faint/40 backdrop-blur-sm transition-all duration-300 hover:border-ghost-red/50 hover:text-ghost-red/70 hover:shadow-[0_0_12px_rgba(232,48,42,0.15)]"
         aria-label={isMuted ? "Activar sonido" : "Silenciar sonido"}
       >
-        {isMuted ? (
+        {isLoading && !hasPlayedRef.current ? (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="size-4 animate-spin"
+          >
+            <path d="M12 2v4m0 12v4m-7.07-3.93l2.83-2.83m8.48-8.48l2.83-2.83M2 12h4m12 0h4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83" />
+          </svg>
+        ) : isMuted ? (
           <svg
             viewBox="0 0 24 24"
             fill="none"

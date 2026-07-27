@@ -214,6 +214,6 @@ export const contactInfo = {
 };
 
 export const socialLinks = [
-  { label: "Instagram", href: "https://instagram.com" },
-  { label: "Facebook", href: "https://facebook.com" },
+  { label: "Instagram", href: "https://www.instagram.com/black.ghost.garage/", icon: "instagram" },
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61581304949010", icon: "facebook" },
 ];
