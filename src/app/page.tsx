@@ -8,6 +8,7 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import RevealProvider from "@/components/RevealProvider";
 import AudioPlayer from "@/components/AudioPlayer";
+import WhatsAppFloating from "@/components/WhatsAppFloating";
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -67,6 +68,7 @@ export default function Home() {
         <Footer />
       </RevealProvider>
       <AudioPlayer />
+      <WhatsAppFloating />
     </>
   );
 }

@@ -53,6 +53,7 @@
 | 2026-07-26 | **Gallery — CTA "Próximamente"** | `data.ts` — eliminated 6 hardcoded `galleryItems`. `Gallery.tsx` — cuando la API no tiene datos, muestra CTA "Próximamente" con estética industrial (double-bezel, grid background, botón "Agendar cita"). Sección `#portafolio` sigue visible para nav. |
 | 2026-07-26 | **ReviewsCarousel — touch fluido (v2)** | Reescrito con ref-based offset (sin re-renders). Nuevo clase `.reviews-touch-active` con `animation: none !important` para deshabilitar CSS animation en mobile. Velocity tracking simplificado. Rubber band effect. Snap con transición CSS. |
 | 2026-07-26 | **globals.css — reviews-touch-active** | Nueva clase `.reviews-touch-active` que deshabilita animación CSS y aplica `touch-action: pan-y` para móvil. |
+| 2026-07-26 | **Botón flotante WhatsApp (NUEVO)** | Nuevo componente `WhatsAppFloating.tsx` — botón FAB verde fijo en esquina inferior izquierda con efecto parallax al scroll (±25px). Al hacer clic abre mini-modal con formulario simplificado (Nombre, Teléfono, Vehículo marca/modelo/motor, Año, Descripción del servicio). Envía datos por WhatsApp al `wa.me/525635363577`. Desaparece con fade-out cuando la sección `#contacto` entra en viewport (IntersectionObserver). Se cierra con Escape o clic fuera. `page.tsx` actualizado con el componente fuera de `<RevealProvider>`. |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 
@@ -124,6 +125,7 @@ black-ghosts-garage/
 │   │   ├── Contact.tsx         # Formulario validado + mapa SVG + carrusel reseñas (client)
 │   │   ├── ReviewsCarousel.tsx  # Carrusel infinito reseñas + touch drag en móvil (client)
 │   │   ├── AudioPlayer.tsx     # Botón de audio con anillo pulsante (client)
+│   │   ├── WhatsAppFloating.tsx # Botón flotante WhatsApp + mini-formulario (client)
 │   │   ├── BackToSiteLink.tsx   # Link "Volver al sitio" con window.close() (client)
 │   │   ├── Footer.tsx          # Pie de página (client)
 │   │   └── RevealProvider.tsx  # Wrapper scroll-reveal (client)
