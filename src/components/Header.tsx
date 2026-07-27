@@ -77,25 +77,6 @@ export default function Header() {
             />
             Agendar cita
           </a>
-          <a
-            href="/admin"
-            className="btn-press flex size-10 items-center justify-center border border-line-soft text-bone-faint transition-all duration-200 hover:border-ghost-red/50 hover:text-ghost-red"
-            aria-label="Panel de administración"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="size-4"
-              aria-hidden="true"
-            >
-              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </a>
         </div>
 
         {/* Mobile hamburger — magnético con morphing a X */}
@@ -163,33 +144,6 @@ export default function Header() {
               }}
             >
               Agendar cita
-            </a>
-            <a
-              href="/admin"
-              onClick={() => setMobileOpen(false)}
-              className={`mt-3 flex items-center justify-center gap-2 border border-line-soft px-5 py-3 text-[11px] uppercase text-bone-dim tracking-[0.1em] transition-all duration-300 hover:border-ghost-red/50 hover:text-ghost-red ${
-                mobileOpen
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-4"
-              }`}
-              style={{
-                transitionDelay: mobileOpen ? `${100 + (navLinks.length + 1) * 50}ms` : "0ms",
-              }}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4"
-                aria-hidden="true"
-              >
-                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              Administración
             </a>
           </nav>
         </div>

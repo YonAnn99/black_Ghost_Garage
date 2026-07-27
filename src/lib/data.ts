@@ -60,7 +60,7 @@ export type WorkshopStats = {
 };
 
 export const workshopStats: WorkshopStats = {
-  area: "1,200",
+  area: "+400",
   areaLabel: "Metros cuadrados de área de trabajo",
   carBays: 9,
   carBaysLabel: "Cajones automóviles",

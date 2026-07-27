@@ -48,6 +48,7 @@
 | 2026-07-26 | **ReviewsCarousel — touch drag en móvil** | `ReviewsCarousel.tsx` reescrito con soporte táctil: `onTouchStart/Move/End` para drag manual en móvil. Snap a tarjeta más cercana al soltar. Detección de dispositivo táctil con `matchMedia("(hover: none)")`. Desktop mantiene CSS auto-scroll. Hint "Desliza para ver más" en móvil. |
 | 2026-07-26 | **AudioPlayer — rediseño visual** | `AudioPlayer.tsx` — botón aumentado a `size-12` (48px). Borde `ghost-red/40` → hover `ghost-red/70`. Anillo pulsante CSS (`pulse-ring` keyframe) cuando muted para invitar a tocar. Icono `size-5`. Fondo `bg-void/90`. |
 | 2026-07-26 | **globals.css — reviews pausado + pulse-ring** | Agregado `.reviews-scroll-paused` con `animation-play-state: paused`. Nuevo keyframe `pulse-ring` (scale 1→1.6, opacity 0.6→0) para anillo del botón de audio. |
+| 2026-07-26 | **Seguridad /admin — blindaje completo** | `robots.txt` — `Disallow: /admin` agregado. `next.config.ts` — headers `X-Robots-Tag: noindex, nofollow, nosnippet, noarchive` + `Cache-Control: no-store` para `/admin/*`. `Header.tsx` — enlace `/admin` eliminado del CTA desktop y menú mobile. `middleware.ts` — headers de seguridad inyectados server-side para todas las rutas `/admin/*`. Auth ya usa Supabase Auth (bcrypt + rate limiting incluido). |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 
@@ -188,7 +189,8 @@ black-ghosts-garage/
 ### 🔴 Prioridad Alta (Producción)
 
 - [ ] Performance de imágenes — Usar `<Image>` de Next.js en Gallery y Equipment, lazy loading, formatos WebP/AVIF
-- [ ] Seguridad — Rate limiting en `/api/contact`, sanitizar inputs, headers de seguridad (CSP, X-Frame-Options)
+- [x] ~~Seguridad — Rate limiting en `/api/contact`, sanitizar inputs, headers de seguridad (CSP, X-Frame-Options)~~
+- [x] ~~Seguridad /admin — Blindaje completo: robots.txt Disallow, X-Robots-Tag noindex, enlace eliminado del Header, middleware con headers de seguridad~~
 
 ### 🟡 Prioridad Media (UX)
 

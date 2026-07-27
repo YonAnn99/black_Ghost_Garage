@@ -31,6 +31,13 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  // Headers de seguridad para todas las rutas /admin
+  if (pathname.startsWith("/admin")) {
+    supabaseResponse.headers.set("X-Robots-Tag", "noindex, nofollow, nosnippet, noarchive");
+    supabaseResponse.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    supabaseResponse.headers.set("Pragma", "no-cache");
+  }
+
   // Si está en /admin y YA tiene sesión → ir al dashboard
   if (pathname === "/admin" && user) {
     const url = request.nextUrl.clone();

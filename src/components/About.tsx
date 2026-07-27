@@ -1,7 +1,7 @@
 const stats = [
-  { value: "+800", label: "Vehículos atendidos", id: "STAT.01" },
-  { value: "12", label: "Especialistas en planta", id: "STAT.02" },
-  { value: "4.8★", label: "Calificación promedio", id: "STAT.03" },
+  { value: "+100", label: "Vehículos atendidos", id: "STAT.01" },
+  { value: "2", label: "Especialistas en planta", id: "STAT.02" },
+  { value: "5 ★", label: "Calificación promedio", id: "STAT.03" },
 ];
 
 export default function About() {
