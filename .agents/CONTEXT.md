@@ -54,6 +54,7 @@
 | 2026-07-26 | **ReviewsCarousel — touch fluido (v2)** | Reescrito con ref-based offset (sin re-renders). Nuevo clase `.reviews-touch-active` con `animation: none !important` para deshabilitar CSS animation en mobile. Velocity tracking simplificado. Rubber band effect. Snap con transición CSS. |
 | 2026-07-26 | **globals.css — reviews-touch-active** | Nueva clase `.reviews-touch-active` que deshabilita animación CSS y aplica `touch-action: pan-y` para móvil. |
 | 2026-07-26 | **Botón flotante WhatsApp (NUEVO)** | Nuevo componente `WhatsAppFloating.tsx` — botón FAB verde fijo en esquina inferior izquierda con efecto parallax al scroll (±25px). Al hacer clic abre mini-modal con formulario simplificado (Nombre, Teléfono, Vehículo marca/modelo/motor, Año, Descripción del servicio). Envía datos por WhatsApp al `wa.me/525635363577`. Desaparece con fade-out cuando la sección `#contacto` entra en viewport (IntersectionObserver). Se cierra con Escape o clic fuera. `page.tsx` actualizado con el componente fuera de `<RevealProvider>`. |
+| 2026-07-28 | **Consentimiento en WhatsApp flotante** | `WhatsAppFloating.tsx` ahora exige aceptar el Aviso de Privacidad antes de abrir WhatsApp. Incluye checkbox, enlace que abre el aviso en una pestaña nueva, mensaje de validación y reinicio del consentimiento tras un envío exitoso. |
 
 **Cambios técnicos de la refactor del 2026-06-27:**
 

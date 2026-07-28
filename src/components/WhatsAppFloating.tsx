@@ -8,6 +8,7 @@ type FormValues = {
   vehiculo: string;
   anio: string;
   descripcion: string;
+  privacidad: boolean;
 };
 
 export default function WhatsAppFloating() {
@@ -20,6 +21,7 @@ export default function WhatsAppFloating() {
     vehiculo: "",
     anio: "",
     descripcion: "",
+    privacidad: false,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof FormValues, string>>>({});
   const modalRef = useRef<HTMLDivElement>(null);
@@ -78,11 +80,12 @@ export default function WhatsAppFloating() {
     if (!v.descripcion.trim()) e.descripcion = "Requerido";
     else if (v.descripcion.trim().length < 10)
       e.descripcion = "Mín. 10 caracteres";
+    if (!v.privacidad) e.privacidad = "Debes aceptar el Aviso de Privacidad.";
     return e;
   }, []);
 
   const handleChange = useCallback(
-    (field: keyof FormValues, value: string) => {
+    (field: keyof FormValues, value: string | boolean) => {
       setValues((prev) => {
         const next = { ...prev, [field]: value };
         setErrors(validate(next));
@@ -113,7 +116,14 @@ Solicito cita para diagnóstico.`;
       "noopener,noreferrer"
     );
     setOpen(false);
-    setValues({ nombre: "", telefono: "", vehiculo: "", anio: "", descripcion: "" });
+    setValues({
+      nombre: "",
+      telefono: "",
+      vehiculo: "",
+      anio: "",
+      descripcion: "",
+      privacidad: false,
+    });
   }, [values, validate]);
 
   const hasErrors = Object.keys(errors).length > 0;
@@ -198,6 +208,33 @@ Solicito cita para diagnóstico.`;
                 className="w-full resize-none border border-line bg-panel px-3 py-2 text-[13px] text-bone placeholder:text-bone-faint focus:border-ghost-red focus:outline-none transition-colors"
               />
             </MiniField>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="flex cursor-pointer items-start gap-2">
+                <input
+                  type="checkbox"
+                  checked={values.privacidad}
+                  onChange={(e) => handleChange("privacidad", e.target.checked)}
+                  className="mt-0.5 size-3.5 shrink-0 border border-line bg-panel accent-ghost-red"
+                />
+                <span className="text-[11px] leading-relaxed text-bone-dim">
+                  He leído y acepto el{" "}
+                  <a
+                    href="/aviso-de-privacidad"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open("/aviso-de-privacidad", "_blank");
+                    }}
+                    className="text-ghost-red underline underline-offset-2 hover:text-bone"
+                  >
+                    Aviso de Privacidad
+                  </a>
+                </span>
+              </label>
+              {errors.privacidad && (
+                <p className="text-[10px] text-ghost-red">{errors.privacidad}</p>
+              )}
+            </div>
 
             <button
               type="submit"
